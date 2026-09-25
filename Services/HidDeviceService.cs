@@ -193,18 +193,66 @@ public class HidDeviceService : IDisposable
             };
         }
 
+        // Microsoft Xbox oficial
+        if (dev.VendorId == 0x045E)
+        {
+            return dev.ProductId switch
+            {
+                0x028E or 0x028F => ControllerType.Xbox360,
+                0x02D1 or 0x02DD or 0x02E3 or 0x02EA or 0x0B00 => ControllerType.XboxOne,
+                0x0B12 or 0x0B13 or 0x0B20 or 0x0B22 => ControllerType.XboxSeries,
+                _ => ControllerType.XboxOne
+            };
+        }
+
+        // Nintendo oficial
+        if (dev.VendorId == 0x057E)
+        {
+            return dev.ProductId switch
+            {
+                0x2009 => ControllerType.SwitchPro,
+                0x2006 or 0x2007 => ControllerType.SwitchJoyCon,
+                _ => ControllerType.SwitchPro
+            };
+        }
+
+        // Fabricantes reconocidos de mandos (Razer, Logitech, 8BitDo, Thrustmaster, PowerA, PDP/Victrix, Nacon, Scuf, SteelSeries, GameSir, Flydigi)
+        if (dev.VendorId is 0x1532 or 0x046D or 0x2DC8 or 0x044F or 0x24C6 or 0x20D6 or 0x0E6F or 0x146B or 0x2E95 or 0x1038 or 0x3537 or 0x2F24 or 0x0738 or 0x0079)
+        {
+            return ControllerType.GenericHid;
+        }
+
         string prod = dev.ProductName.ToLowerInvariant();
+        if (prod.Contains("xbox"))
+        {
+            return prod.Contains("series") ? ControllerType.XboxSeries : ControllerType.XboxOne;
+        }
+
+        if (prod.Contains("switch") || prod.Contains("pro controller"))
+        {
+            return ControllerType.SwitchPro;
+        }
+
+        if (prod.Contains("joy-con"))
+        {
+            return ControllerType.SwitchJoyCon;
+        }
+
         if (prod.Contains("dualsense") || prod.Contains("ps5"))
         {
             return ControllerType.ClonePs5;
         }
 
-        if (prod.Contains("dualshock") || prod.Contains("ps4") || prod.Contains("wireless controller"))
+        if (prod.Contains("dualshock") || prod.Contains("ps4") || (prod.Contains("wireless controller") && dev.VendorId != 0x045E))
         {
             return ControllerType.ClonePs4;
         }
 
-        if (prod.Contains("gamepad") || prod.Contains("controller") || prod.Contains("joystick"))
+        if (prod.Contains("razer") || prod.Contains("wolverine") || prod.Contains("raiju") ||
+            prod.Contains("gamesir") || prod.Contains("flydigi") || prod.Contains("8bitdo") ||
+            prod.Contains("powera") || prod.Contains("victrix") || prod.Contains("scuf") ||
+            prod.Contains("nacon") || prod.Contains("thrustmaster") ||
+            prod.Contains("gamepad") || prod.Contains("controller") || prod.Contains("joystick"))
         {
             return ControllerType.GenericHid;
         }

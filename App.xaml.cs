@@ -60,8 +60,8 @@ public partial class App : Application
             Console.WriteLine("        Control - Escáner de Mandos HID           ");
             Console.WriteLine("==================================================");
 
-            var svc = new HidDeviceService();
-            var devices = svc.EnumerateDevices();
+            var mgr = new ControllerManager();
+            var devices = mgr.GetAvailableControllers();
 
             if (devices.Count == 0)
             {

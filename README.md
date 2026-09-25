@@ -93,10 +93,12 @@ Basta con hacer doble clic en:
 2. **Detección del mando**:
    * Si su mando no aparece en la lista desplegable inicial, marque la casilla **"Ver Todos"** y pulse **"🔄 Refrescar"**. Esto mostrará cualquier dispositivo HID conectado para que pueda seleccionarlo manualmente.
 3. **Selector de Protocolo**:
-   * **Auto-detect**: Detecta automáticamente si el reporte coincide con DualSense o DualShock 4.
-   * **DualSense**: Seleccione este modo si su mando es una copia de PS5 o tiene forma de DualSense.
-   * **DualShock 4**: Seleccione este modo si es una réplica de PS4.
-   * **Generic HID**: Para mandos que reportan datos en formato DirectInput estándar.
+   * **Auto-detect**: Detecta automáticamente si el mando es DualSense, DualShock 4, Xbox (XInput / Bluetooth HID), Switch Pro o DirectInput genérico.
+   * **DualSense**: Mandos originales de PS5 o réplicas DualSense con soporte de gatillos adaptativos y telemetría.
+   * **DualShock 4**: Mandos originales de PS4 o clones DualShock 4.
+   * **Xbox**: Mandos oficiales y compatibles de Xbox (Xbox 360, Xbox One, Xbox Series X|S, Elite) vía XInput nativo o Bluetooth HID.
+   * **Switch Pro**: Mandos de Nintendo Switch Pro Controller y Joy-Con (vía USB o Bluetooth con soporte de giroscopio y batería).
+   * **Generic HID**: Para mandos de PC DirectInput estándar (Logitech, 8BitDo, adaptadores retro, volantes o gamepads de bajo costo).
 4. **¿Cómo saber si el clon tiene gatillos adaptativos reales?**:
    * Configure el efecto en **"Resistencia Continua (Rigid)"** con fuerza en **220** o más y pulse **"Enviar Efecto"**.
    * Si al apretar el gatillo siente resistencia mecánica variable en el recorrido del dedo, el mando cuenta con **motores servo reales**.

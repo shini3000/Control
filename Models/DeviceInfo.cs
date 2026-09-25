@@ -9,6 +9,11 @@ public enum ControllerType
     DualShock4V2,   // PS4 v2
     ClonePs5,       // PS5 Imitation
     ClonePs4,       // PS4 Imitation
+    Xbox360,        // Xbox 360
+    XboxOne,        // Xbox One / S / X
+    XboxSeries,     // Xbox Series X|S
+    SwitchPro,      // Nintendo Switch Pro Controller
+    SwitchJoyCon,   // Nintendo Joy-Con
     GenericHid      // Generic Gamepad
 }
 
@@ -16,7 +21,8 @@ public enum ConnectionType
 {
     Unknown,
     USB,
-    Bluetooth
+    Bluetooth,
+    XInput
 }
 
 public class DeviceInfo
@@ -34,12 +40,18 @@ public class DeviceInfo
     public ConnectionType Connection { get; set; } = ConnectionType.Unknown;
     public int InputReportLength { get; set; } = 64;
     public int OutputReportLength { get; set; } = 64;
+    public int XInputUserIndex { get; set; } = -1;
+    public bool IsXInput => XInputUserIndex >= 0 || Connection == ConnectionType.XInput;
 
     public string DisplayTitle
     {
         get
         {
             string name = !string.IsNullOrWhiteSpace(ProductName) ? ProductName : GetTypeFriendlyName();
+            if (IsXInput)
+            {
+                return $"{name} [XInput Slot {XInputUserIndex + 1}]";
+            }
             string conn = Connection == ConnectionType.USB ? "USB" : (Connection == ConnectionType.Bluetooth ? "BT" : "HID");
             return $"{name} [{conn}] (VID:{VendorId:X4} PID:{ProductId:X4})";
         }
@@ -55,8 +67,13 @@ public class DeviceInfo
             ControllerType.DualShock4V2 => "Sony DualShock 4 v2 (PS4)",
             ControllerType.ClonePs5 => "Mando Imitación PS5",
             ControllerType.ClonePs4 => "Mando Imitación PS4",
+            ControllerType.Xbox360 => "Mando Xbox 360",
+            ControllerType.XboxOne => "Mando Xbox One",
+            ControllerType.XboxSeries => "Mando Xbox Series X|S",
+            ControllerType.SwitchPro => "Nintendo Switch Pro Controller",
+            ControllerType.SwitchJoyCon => "Nintendo Joy-Con",
             ControllerType.GenericHid => "Mando HID Genérico",
-            _ => "Dispositivo HID"
+            _ => "Dispositivo de Control"
         };
     }
 

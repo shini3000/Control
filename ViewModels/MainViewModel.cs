@@ -62,6 +62,8 @@ public class MainViewModel : ViewModelBase
         ProtocolMode.AutoDetect,
         ProtocolMode.DualSense,
         ProtocolMode.DualShock4,
+        ProtocolMode.Xbox,
+        ProtocolMode.SwitchPro,
         ProtocolMode.GenericHid
     };
 
@@ -621,24 +623,25 @@ public class MainViewModel : ViewModelBase
         }
 
         // Detección de última pulsación para el panel de botones
-        if (snapshot.Triangle) LastPressedButtonText = "TRIÁNGULO detectado";
-        else if (snapshot.Circle) LastPressedButtonText = "CÍRCULO detectado";
-        else if (snapshot.Cross) LastPressedButtonText = "CRUZ (X) detectada";
-        else if (snapshot.Square) LastPressedButtonText = "CUADRADO detectado";
-        else if (snapshot.L1) LastPressedButtonText = "L1 presionado";
-        else if (snapshot.R1) LastPressedButtonText = "R1 presionado";
-        else if (snapshot.L2Button) LastPressedButtonText = "Gatillo L2 fondo";
-        else if (snapshot.R2Button) LastPressedButtonText = "Gatillo R2 fondo";
-        else if (snapshot.L3) LastPressedButtonText = "L3 (Stick Izquierdo)";
-        else if (snapshot.R3) LastPressedButtonText = "R3 (Stick Derecho)";
+        if (snapshot.Triangle) LastPressedButtonText = "TRIÁNGULO (△) / Y detectado";
+        else if (snapshot.Circle) LastPressedButtonText = "CÍRCULO (○) / B / A detectado";
+        else if (snapshot.Cross) LastPressedButtonText = "CRUZ (✕) / A / B detectada";
+        else if (snapshot.Square) LastPressedButtonText = "CUADRADO (□) / X / Y detectado";
+        else if (snapshot.L1) LastPressedButtonText = "L1 / LB / L presionado";
+        else if (snapshot.R1) LastPressedButtonText = "R1 / RB / R presionado";
+        else if (snapshot.L2Button) LastPressedButtonText = "Gatillo L2 / LT fondo";
+        else if (snapshot.R2Button) LastPressedButtonText = "Gatillo R2 / RT fondo";
+        else if (snapshot.L3) LastPressedButtonText = "L3 / LSB (Stick Izquierdo)";
+        else if (snapshot.R3) LastPressedButtonText = "R3 / RSB (Stick Derecho)";
         else if (snapshot.DpadUp) LastPressedButtonText = "D-PAD ARRIBA";
         else if (snapshot.DpadDown) LastPressedButtonText = "D-PAD ABAJO";
         else if (snapshot.DpadLeft) LastPressedButtonText = "D-PAD IZQUIERDA";
         else if (snapshot.DpadRight) LastPressedButtonText = "D-PAD DERECHA";
-        else if (snapshot.Share) LastPressedButtonText = "SHARE / CREATE";
-        else if (snapshot.Options) LastPressedButtonText = "OPTIONS";
-        else if (snapshot.PsButton) LastPressedButtonText = "BOTÓN PS";
+        else if (snapshot.Share) LastPressedButtonText = "SHARE / VIEW / MINUS (-)";
+        else if (snapshot.Options) LastPressedButtonText = "OPTIONS / MENU / PLUS (+)";
+        else if (snapshot.PsButton) LastPressedButtonText = "BOTÓN PS / XBOX / HOME";
         else if (snapshot.TouchpadButton) LastPressedButtonText = "CLIC TOUCHPAD";
+        else if (snapshot.MicMute) LastPressedButtonText = "MUTE / CAPTURE / SHARE";
 
         OnPropertyChanged(nameof(IsTrianglePressed));
         OnPropertyChanged(nameof(IsCirclePressed));
