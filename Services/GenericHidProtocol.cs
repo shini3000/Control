@@ -46,6 +46,15 @@ public static class GenericHidProtocol
             state.L3 = (b2 & 0x04) != 0;
             state.R3 = (b2 & 0x08) != 0;
             state.PsButton = (b2 & 0x10) != 0;
+
+            byte hat = (byte)(b2 >> 4);
+            if (hat <= 7)
+            {
+                state.DpadUp = hat is 0 or 1 or 7;
+                state.DpadRight = hat is 1 or 2 or 3;
+                state.DpadDown = hat is 3 or 4 or 5;
+                state.DpadLeft = hat is 5 or 6 or 7;
+            }
         }
 
         return true;

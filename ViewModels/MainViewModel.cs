@@ -158,11 +158,24 @@ public class MainViewModel : ViewModelBase
         private set => SetProperty(ref _state, value);
     }
 
-    // Botones de acción principales (Propiedades directas y reactivas para la UI)
+    // Botones de acción principales y digitales (Propiedades reactivas para la UI)
     public bool IsTrianglePressed => State.Triangle;
     public bool IsCirclePressed => State.Circle;
     public bool IsCrossPressed => State.Cross;
     public bool IsSquarePressed => State.Square;
+    public bool IsL1Pressed => State.L1;
+    public bool IsR1Pressed => State.R1;
+    public bool IsL2ButtonPressed => State.L2Button;
+    public bool IsR2ButtonPressed => State.R2Button;
+    public bool IsDpadUpPressed => State.DpadUp;
+    public bool IsDpadDownPressed => State.DpadDown;
+    public bool IsDpadLeftPressed => State.DpadLeft;
+    public bool IsDpadRightPressed => State.DpadRight;
+    public bool IsSharePressed => State.Share;
+    public bool IsOptionsPressed => State.Options;
+    public bool IsPsButtonPressed => State.PsButton;
+    public bool IsTouchpadPressed => State.TouchpadButton;
+    public bool IsMicMutePressed => State.MicMute;
 
     // Historial para gráfico de osciloscopio IMU
     public List<double> AccelHistoryX { get; } = new(100);
@@ -631,6 +644,19 @@ public class MainViewModel : ViewModelBase
         OnPropertyChanged(nameof(IsCirclePressed));
         OnPropertyChanged(nameof(IsCrossPressed));
         OnPropertyChanged(nameof(IsSquarePressed));
+        OnPropertyChanged(nameof(IsL1Pressed));
+        OnPropertyChanged(nameof(IsR1Pressed));
+        OnPropertyChanged(nameof(IsL2ButtonPressed));
+        OnPropertyChanged(nameof(IsR2ButtonPressed));
+        OnPropertyChanged(nameof(IsDpadUpPressed));
+        OnPropertyChanged(nameof(IsDpadDownPressed));
+        OnPropertyChanged(nameof(IsDpadLeftPressed));
+        OnPropertyChanged(nameof(IsDpadRightPressed));
+        OnPropertyChanged(nameof(IsSharePressed));
+        OnPropertyChanged(nameof(IsOptionsPressed));
+        OnPropertyChanged(nameof(IsPsButtonPressed));
+        OnPropertyChanged(nameof(IsTouchpadPressed));
+        OnPropertyChanged(nameof(IsMicMutePressed));
 
         OnPropertyChanged(nameof(CurrentTestStickX));
         OnPropertyChanged(nameof(CurrentTestStickY));
