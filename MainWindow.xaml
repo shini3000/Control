@@ -1,0 +1,1565 @@
+<Window x:Class="PsCloneTester.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml"
+        xmlns:vm="clr-namespace:PsCloneTester.ViewModels"
+        xmlns:controls="clr-namespace:PsCloneTester.Controls"
+        xmlns:conv="clr-namespace:PsCloneTester.Converters"
+        mc:Ignorable="d"
+        Title="Control"
+        Height="840" Width="1240"
+        MinHeight="720" MinWidth="1080"
+        WindowStartupLocation="CenterScreen"
+        Background="#0D0F15"
+        Foreground="#E0E6F0">
+
+    <Window.DataContext>
+        <vm:MainViewModel/>
+    </Window.DataContext>
+
+    <Window.Resources>
+        <!-- Conversores -->
+        <conv:BoolToBrushConverter x:Key="BoolToBrush"
+                                   TrueBrush="#00E599"
+                                   FalseBrush="#252C3D"/>
+
+        <conv:BoolToBrushConverter x:Key="CrossBrush"
+                                   TrueBrush="#0080FF"
+                                   FalseBrush="#252C3D"/>
+
+        <conv:BoolToBrushConverter x:Key="CircleBrush"
+                                   TrueBrush="#FF3355"
+                                   FalseBrush="#252C3D"/>
+
+        <conv:BoolToBrushConverter x:Key="SquareBrush"
+                                   TrueBrush="#FF44CC"
+                                   FalseBrush="#252C3D"/>
+
+        <conv:BoolToBrushConverter x:Key="TriangleBrush"
+                                   TrueBrush="#00DDAA"
+                                   FalseBrush="#252C3D"/>
+
+        <conv:TriggerPercentageConverter x:Key="TriggerPercent"/>
+        <conv:TriggerPercentOnlyConverter x:Key="TriggerPercentOnly"/>
+
+        <conv:BoolToVisibilityConverter x:Key="BoolToVis" Invert="False"/>
+        <conv:BoolToVisibilityConverter x:Key="InverseBoolToVis" Invert="True"/>
+
+        <conv:IntEqualsToBrushConverter x:Key="NavBgConverter"
+                                        MatchBrush="#1A2030"
+                                        NonMatchBrush="Transparent"/>
+
+        <conv:IntEqualsToBrushConverter x:Key="NavIndicatorConverter"
+                                        MatchBrush="#00C3FF"
+                                        NonMatchBrush="Transparent"/>
+
+        <conv:IntEqualsToBrushConverter x:Key="NavForegroundConverter"
+                                        MatchBrush="#FFFFFF"
+                                        NonMatchBrush="#8898AA"/>
+
+        <conv:IntEqualsToVisibilityConverter x:Key="IntToVis"/>
+
+        <!-- Estilos Generales -->
+        <Style x:Key="CardBorder" TargetType="Border">
+            <Setter Property="Background" Value="#12151E"/>
+            <Setter Property="BorderBrush" Value="#1E2536"/>
+            <Setter Property="BorderThickness" Value="1"/>
+            <Setter Property="CornerRadius" Value="10"/>
+            <Setter Property="Padding" Value="18"/>
+        </Style>
+
+        <Style x:Key="SubCardBorder" TargetType="Border">
+            <Setter Property="Background" Value="#161B26"/>
+            <Setter Property="BorderBrush" Value="#222A3C"/>
+            <Setter Property="BorderThickness" Value="1"/>
+            <Setter Property="CornerRadius" Value="8"/>
+            <Setter Property="Padding" Value="12"/>
+        </Style>
+
+        <Style x:Key="ActionBtn" TargetType="Button">
+            <Setter Property="Background" Value="#0077FF"/>
+            <Setter Property="Foreground" Value="White"/>
+            <Setter Property="FontWeight" Value="SemiBold"/>
+            <Setter Property="FontSize" Value="12"/>
+            <Setter Property="Padding" Value="16,8"/>
+            <Setter Property="BorderThickness" Value="0"/>
+            <Setter Property="Cursor" Value="Hand"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Button">
+                        <Border Background="{TemplateBinding Background}" CornerRadius="6" Padding="{TemplateBinding Padding}">
+                            <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                        </Border>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+            <Style.Triggers>
+                <Trigger Property="IsMouseOver" Value="True">
+                    <Setter Property="Background" Value="#0090FF"/>
+                </Trigger>
+            </Style.Triggers>
+        </Style>
+
+        <Style x:Key="SecondaryBtn" TargetType="Button" BasedOn="{StaticResource ActionBtn}">
+            <Setter Property="Background" Value="#1C2333"/>
+            <Setter Property="Foreground" Value="#C0D0E5"/>
+            <Style.Triggers>
+                <Trigger Property="IsMouseOver" Value="True">
+                    <Setter Property="Background" Value="#283248"/>
+                </Trigger>
+            </Style.Triggers>
+        </Style>
+
+        <Style x:Key="DangerBtn" TargetType="Button" BasedOn="{StaticResource ActionBtn}">
+            <Setter Property="Background" Value="#D32F2F"/>
+            <Style.Triggers>
+                <Trigger Property="IsMouseOver" Value="True">
+                    <Setter Property="Background" Value="#E53935"/>
+                </Trigger>
+            </Style.Triggers>
+        </Style>
+
+        <!-- Gradientes para los Gatillos Analógicos L2 y R2 -->
+        <LinearGradientBrush x:Key="L2TriggerBrush" StartPoint="0,1" EndPoint="0,0">
+            <GradientStop Color="#0066FF" Offset="0.0"/>
+            <GradientStop Color="#00E5FF" Offset="1.0"/>
+        </LinearGradientBrush>
+
+        <LinearGradientBrush x:Key="R2TriggerBrush" StartPoint="0,1" EndPoint="0,0">
+            <GradientStop Color="#D00036" Offset="0.0"/>
+            <GradientStop Color="#FF3355" Offset="1.0"/>
+        </LinearGradientBrush>
+
+        <!-- Template y Estilo Oscuro Completo para ComboBox (Evita fondo blanco en popups de Windows) -->
+        <ControlTemplate x:Key="DarkComboBoxTemplate" TargetType="ComboBox">
+            <Grid x:Name="MainGrid" SnapsToDevicePixels="True">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition MinWidth="32" Width="32"/>
+                </Grid.ColumnDefinitions>
+
+                <!-- Popup desplegable 100% Oscuro -->
+                <Popup x:Name="PART_Popup" AllowsTransparency="True" Grid.ColumnSpan="2"
+                       Placement="Bottom" Margin="0,4,0,0"
+                       PlacementTarget="{Binding RelativeSource={RelativeSource TemplatedParent}}"
+                       IsOpen="{Binding IsDropDownOpen, Mode=TwoWay, RelativeSource={RelativeSource TemplatedParent}}"
+                       PopupAnimation="Fade" Focusable="False">
+                    <Border x:Name="DropDownBorder"
+                            Background="#121622"
+                            BorderBrush="#00C3FF"
+                            BorderThickness="1"
+                            CornerRadius="8"
+                            Padding="4"
+                            MinWidth="{Binding ActualWidth, RelativeSource={RelativeSource TemplatedParent}}"
+                            MaxHeight="{TemplateBinding MaxDropDownHeight}">
+                        <ScrollViewer SnapsToDevicePixels="True" CanContentScroll="True"
+                                      VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled">
+                            <ItemsPresenter KeyboardNavigation.DirectionalNavigation="Contained"
+                                            SnapsToDevicePixels="{TemplateBinding SnapsToDevicePixels}"/>
+                        </ScrollViewer>
+                    </Border>
+                </Popup>
+
+                <!-- Botón principal del selector (Debe llamarse 'toggleButton' en minúsculas para que ComboBox lo reconozca internamente) -->
+                <ToggleButton x:Name="toggleButton" Grid.ColumnSpan="2"
+                              HorizontalAlignment="Stretch" VerticalAlignment="Stretch"
+                              Background="{TemplateBinding Background}"
+                              BorderBrush="{TemplateBinding BorderBrush}"
+                              BorderThickness="1"
+                              IsChecked="{Binding IsDropDownOpen, Mode=TwoWay, RelativeSource={RelativeSource TemplatedParent}}"
+                              Focusable="False" ClickMode="Press"
+                              Cursor="Hand">
+                    <ToggleButton.Template>
+                        <ControlTemplate TargetType="ToggleButton">
+                            <Border x:Name="ToggleBorder"
+                                    HorizontalAlignment="Stretch" VerticalAlignment="Stretch"
+                                    Background="{TemplateBinding Background}"
+                                    BorderBrush="{TemplateBinding BorderBrush}"
+                                    BorderThickness="1"
+                                    CornerRadius="6"
+                                    SnapsToDevicePixels="True"/>
+                            <ControlTemplate.Triggers>
+                                <Trigger Property="IsMouseOver" Value="True">
+                                    <Setter TargetName="ToggleBorder" Property="BorderBrush" Value="#00C3FF"/>
+                                    <Setter TargetName="ToggleBorder" Property="Background" Value="#1B2232"/>
+                                </Trigger>
+                                <Trigger Property="IsChecked" Value="True">
+                                    <Setter TargetName="ToggleBorder" Property="BorderBrush" Value="#00C3FF"/>
+                                    <Setter TargetName="ToggleBorder" Property="Background" Value="#1B2232"/>
+                                </Trigger>
+                            </ControlTemplate.Triggers>
+                        </ControlTemplate>
+                    </ToggleButton.Template>
+                </ToggleButton>
+
+                <!-- Texto / Ítem Seleccionado -->
+                <ContentPresenter Grid.Column="0" IsHitTestVisible="False"
+                                  Content="{TemplateBinding SelectionBoxItem}"
+                                  ContentTemplate="{TemplateBinding SelectionBoxItemTemplate}"
+                                  ContentTemplateSelector="{TemplateBinding ItemTemplateSelector}"
+                                  Margin="{TemplateBinding Padding}"
+                                  VerticalAlignment="{TemplateBinding VerticalContentAlignment}"
+                                  HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}">
+                    <TextElement.Foreground>
+                        <SolidColorBrush Color="White"/>
+                    </TextElement.Foreground>
+                </ContentPresenter>
+
+                <!-- Icono de Flecha Chevron -->
+                <Path Grid.Column="1" HorizontalAlignment="Center" VerticalAlignment="Center"
+                      Data="M 0 0 L 4 4 L 8 0" Stroke="#8898AA" StrokeThickness="1.8"
+                      IsHitTestVisible="False"/>
+            </Grid>
+            <ControlTemplate.Triggers>
+                <Trigger Property="IsMouseOver" Value="True">
+                    <Setter Property="BorderBrush" Value="#00C3FF"/>
+                </Trigger>
+                <Trigger Property="IsDropDownOpen" Value="True">
+                    <Setter Property="BorderBrush" Value="#00C3FF"/>
+                </Trigger>
+                <Trigger Property="IsEnabled" Value="False">
+                    <Setter Property="Opacity" Value="0.5"/>
+                </Trigger>
+            </ControlTemplate.Triggers>
+        </ControlTemplate>
+
+        <Style TargetType="ComboBox">
+            <Setter Property="Template" Value="{StaticResource DarkComboBoxTemplate}"/>
+            <Setter Property="Background" Value="#151A24"/>
+            <Setter Property="BorderBrush" Value="#252F42"/>
+            <Setter Property="Foreground" Value="#FFFFFF"/>
+            <Setter Property="MinHeight" Value="36"/>
+            <Setter Property="Height" Value="36"/>
+            <Setter Property="Padding" Value="12,6"/>
+            <Setter Property="VerticalContentAlignment" Value="Center"/>
+            <Setter Property="HorizontalContentAlignment" Value="Left"/>
+            <Setter Property="FontSize" Value="12"/>
+            <Setter Property="MaxDropDownHeight" Value="300"/>
+            <Setter Property="Cursor" Value="Hand"/>
+        </Style>
+
+        <!-- Estilo para los ítems desplegables de todos los ComboBox (Fondo Oscuro + Texto Blanco + Hover Cyan) -->
+        <Style TargetType="ComboBoxItem">
+            <Setter Property="Background" Value="Transparent"/>
+            <Setter Property="Foreground" Value="#FFFFFF"/>
+            <Setter Property="FontSize" Value="12"/>
+            <Setter Property="Padding" Value="10,8"/>
+            <Setter Property="Cursor" Value="Hand"/>
+            <Setter Property="HorizontalContentAlignment" Value="Left"/>
+            <Setter Property="VerticalContentAlignment" Value="Center"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="ComboBoxItem">
+                        <Border x:Name="ItemBorder" Background="{TemplateBinding Background}"
+                                TextElement.Foreground="{TemplateBinding Foreground}"
+                                Padding="{TemplateBinding Padding}" CornerRadius="5" Margin="2,1">
+                            <ContentPresenter HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}"
+                                              VerticalAlignment="{TemplateBinding VerticalContentAlignment}"/>
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter TargetName="ItemBorder" Property="Background" Value="#1E2838"/>
+                                <Setter Property="Foreground" Value="#00C3FF"/>
+                            </Trigger>
+                            <Trigger Property="IsSelected" Value="True">
+                                <Setter TargetName="ItemBorder" Property="Background" Value="#0077FF"/>
+                                <Setter Property="Foreground" Value="#FFFFFF"/>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+    </Window.Resources>
+
+    <Grid>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="220"/>
+            <ColumnDefinition Width="*"/>
+        </Grid.ColumnDefinitions>
+
+        <!-- ========================================== -->
+        <!-- SIDEBAR DE NAVEGACIÓN IZQUIERDO            -->
+        <!-- ========================================== -->
+        <Border Grid.Column="0" Background="#0F1219" BorderBrush="#1B2232" BorderThickness="0,0,1,0">
+            <Grid>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto"/> <!-- Marca / Logo -->
+                    <RowDefinition Height="*"/>    <!-- Lista de Navegación -->
+                    <RowDefinition Height="Auto"/> <!-- Pie: Ayuda & Info Mando -->
+                </Grid.RowDefinitions>
+
+                <!-- Logo & Título Control -->
+                <StackPanel Grid.Row="0" Orientation="Horizontal" VerticalAlignment="Center" Margin="20,20,16,24">
+                    <Border Width="34" Height="34" CornerRadius="8" Background="#0077FF" Margin="0,0,12,0">
+                        <ui:SymbolIcon Symbol="Games24" Filled="True" FontSize="18" Foreground="White" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                    </Border>
+                    <StackPanel VerticalAlignment="Center">
+                        <TextBlock Text="Control" FontSize="18" FontWeight="Bold" Foreground="#FFFFFF"/>
+                        <TextBlock Text="Prueba de Mando" FontSize="10" Foreground="#00C3FF" FontWeight="SemiBold"/>
+                    </StackPanel>
+                </StackPanel>
+
+                <!-- Menú de Vistas (Estilo Wpf.Ui Navigation) -->
+                <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled" Margin="10,0">
+                    <StackPanel>
+                        <!-- Item 0: Prueba (Principal como en la imagen) -->
+                        <Button Command="{Binding NavigateCommand}" CommandParameter="0" Cursor="Hand" Margin="0,2">
+                            <Button.Template>
+                                <ControlTemplate TargetType="Button">
+                                    <Border CornerRadius="8" Background="{Binding SelectedNavigationIndex, Converter={StaticResource NavBgConverter}, ConverterParameter=0}" Padding="12,10">
+                                        <Grid>
+                                            <Grid.ColumnDefinitions>
+                                                <ColumnDefinition Width="Auto"/>
+                                                <ColumnDefinition Width="*"/>
+                                                <ColumnDefinition Width="Auto"/>
+                                            </Grid.ColumnDefinitions>
+                                            <ui:SymbolIcon Grid.Column="0" Symbol="Games24" FontSize="17" Margin="0,0,12,0"
+                                                           Foreground="{Binding SelectedNavigationIndex, Converter={StaticResource NavForegroundConverter}, ConverterParameter=0}"/>
+                                            <TextBlock Grid.Column="1" Text="Prueba" FontSize="13" FontWeight="SemiBold" VerticalAlignment="Center"
+                                                       Foreground="{Binding SelectedNavigationIndex, Converter={StaticResource NavForegroundConverter}, ConverterParameter=0}"/>
+                                            <Border Grid.Column="2" Width="4" Height="16" CornerRadius="2"
+                                                    Background="{Binding SelectedNavigationIndex, Converter={StaticResource NavIndicatorConverter}, ConverterParameter=0}"/>
+                                        </Grid>
+                                    </Border>
+                                </ControlTemplate>
+                            </Button.Template>
+                        </Button>
+
+                        <!-- Item 1: Test de Circularidad -->
+                        <Button Command="{Binding NavigateCommand}" CommandParameter="1" Cursor="Hand" Margin="0,2">
+                            <Button.Template>
+                                <ControlTemplate TargetType="Button">
+                                    <Border CornerRadius="8" Background="{Binding SelectedNavigationIndex, Converter={StaticResource NavBgConverter}, ConverterParameter=1}" Padding="12,10">
+                                        <Grid>
+                                            <Grid.ColumnDefinitions>
+                                                <ColumnDefinition Width="Auto"/>
+                                                <ColumnDefinition Width="*"/>
+                                                <ColumnDefinition Width="Auto"/>
+                                            </Grid.ColumnDefinitions>
+                                            <ui:SymbolIcon Grid.Column="0" Symbol="Circle24" FontSize="17" Margin="0,0,12,0"
+                                                           Foreground="{Binding SelectedNavigationIndex, Converter={StaticResource NavForegroundConverter}, ConverterParameter=1}"/>
+                                            <TextBlock Grid.Column="1" Text="Circularidad" FontSize="13" FontWeight="SemiBold" VerticalAlignment="Center"
+                                                       Foreground="{Binding SelectedNavigationIndex, Converter={StaticResource NavForegroundConverter}, ConverterParameter=1}"/>
+                                            <Border Grid.Column="2" Width="4" Height="16" CornerRadius="2"
+                                                    Background="{Binding SelectedNavigationIndex, Converter={StaticResource NavIndicatorConverter}, ConverterParameter=1}"/>
+                                        </Grid>
+                                    </Border>
+                                </ControlTemplate>
+                            </Button.Template>
+                        </Button>
+
+                        <!-- Item 2: Gatillos Adaptativos -->
+                        <Button Command="{Binding NavigateCommand}" CommandParameter="2" Cursor="Hand" Margin="0,2">
+                            <Button.Template>
+                                <ControlTemplate TargetType="Button">
+                                    <Border CornerRadius="8" Background="{Binding SelectedNavigationIndex, Converter={StaticResource NavBgConverter}, ConverterParameter=2}" Padding="12,10">
+                                        <Grid>
+                                            <Grid.ColumnDefinitions>
+                                                <ColumnDefinition Width="Auto"/>
+                                                <ColumnDefinition Width="*"/>
+                                                <ColumnDefinition Width="Auto"/>
+                                            </Grid.ColumnDefinitions>
+                                            <ui:SymbolIcon Grid.Column="0" Symbol="Flash24" FontSize="17" Margin="0,0,12,0"
+                                                           Foreground="{Binding SelectedNavigationIndex, Converter={StaticResource NavForegroundConverter}, ConverterParameter=2}"/>
+                                            <TextBlock Grid.Column="1" Text="Gatillos Hápticos" FontSize="13" FontWeight="SemiBold" VerticalAlignment="Center"
+                                                       Foreground="{Binding SelectedNavigationIndex, Converter={StaticResource NavForegroundConverter}, ConverterParameter=2}"/>
+                                            <Border Grid.Column="2" Width="4" Height="16" CornerRadius="2"
+                                                    Background="{Binding SelectedNavigationIndex, Converter={StaticResource NavIndicatorConverter}, ConverterParameter=2}"/>
+                                        </Grid>
+                                    </Border>
+                                </ControlTemplate>
+                            </Button.Template>
+                        </Button>
+
+                        <!-- Item 3: Sensores e IMU -->
+                        <Button Command="{Binding NavigateCommand}" CommandParameter="3" Cursor="Hand" Margin="0,2">
+                            <Button.Template>
+                                <ControlTemplate TargetType="Button">
+                                    <Border CornerRadius="8" Background="{Binding SelectedNavigationIndex, Converter={StaticResource NavBgConverter}, ConverterParameter=3}" Padding="12,10">
+                                        <Grid>
+                                            <Grid.ColumnDefinitions>
+                                                <ColumnDefinition Width="Auto"/>
+                                                <ColumnDefinition Width="*"/>
+                                                <ColumnDefinition Width="Auto"/>
+                                            </Grid.ColumnDefinitions>
+                                            <ui:SymbolIcon Grid.Column="0" Symbol="Pulse24" FontSize="17" Margin="0,0,12,0"
+                                                           Foreground="{Binding SelectedNavigationIndex, Converter={StaticResource NavForegroundConverter}, ConverterParameter=3}"/>
+                                            <TextBlock Grid.Column="1" Text="Sensores e IMU" FontSize="13" FontWeight="SemiBold" VerticalAlignment="Center"
+                                                       Foreground="{Binding SelectedNavigationIndex, Converter={StaticResource NavForegroundConverter}, ConverterParameter=3}"/>
+                                            <Border Grid.Column="2" Width="4" Height="16" CornerRadius="2"
+                                                    Background="{Binding SelectedNavigationIndex, Converter={StaticResource NavIndicatorConverter}, ConverterParameter=3}"/>
+                                        </Grid>
+                                    </Border>
+                                </ControlTemplate>
+                            </Button.Template>
+                        </Button>
+
+                        <!-- Item 4: Pantalla Táctil -->
+                        <Button Command="{Binding NavigateCommand}" CommandParameter="4" Cursor="Hand" Margin="0,2">
+                            <Button.Template>
+                                <ControlTemplate TargetType="Button">
+                                    <Border CornerRadius="8" Background="{Binding SelectedNavigationIndex, Converter={StaticResource NavBgConverter}, ConverterParameter=4}" Padding="12,10">
+                                        <Grid>
+                                            <Grid.ColumnDefinitions>
+                                                <ColumnDefinition Width="Auto"/>
+                                                <ColumnDefinition Width="*"/>
+                                                <ColumnDefinition Width="Auto"/>
+                                            </Grid.ColumnDefinitions>
+                                            <ui:SymbolIcon Grid.Column="0" Symbol="LineHorizontal120" FontSize="17" Margin="0,0,12,0"
+                                                           Foreground="{Binding SelectedNavigationIndex, Converter={StaticResource NavForegroundConverter}, ConverterParameter=4}"/>
+                                            <TextBlock Grid.Column="1" Text="Touchpad" FontSize="13" FontWeight="SemiBold" VerticalAlignment="Center"
+                                                       Foreground="{Binding SelectedNavigationIndex, Converter={StaticResource NavForegroundConverter}, ConverterParameter=4}"/>
+                                            <Border Grid.Column="2" Width="4" Height="16" CornerRadius="2"
+                                                    Background="{Binding SelectedNavigationIndex, Converter={StaticResource NavIndicatorConverter}, ConverterParameter=4}"/>
+                                        </Grid>
+                                    </Border>
+                                </ControlTemplate>
+                            </Button.Template>
+                        </Button>
+
+                        <!-- Item 5: Vibración & Iluminación -->
+                        <Button Command="{Binding NavigateCommand}" CommandParameter="5" Cursor="Hand" Margin="0,2">
+                            <Button.Template>
+                                <ControlTemplate TargetType="Button">
+                                    <Border CornerRadius="8" Background="{Binding SelectedNavigationIndex, Converter={StaticResource NavBgConverter}, ConverterParameter=5}" Padding="12,10">
+                                        <Grid>
+                                            <Grid.ColumnDefinitions>
+                                                <ColumnDefinition Width="Auto"/>
+                                                <ColumnDefinition Width="*"/>
+                                                <ColumnDefinition Width="Auto"/>
+                                            </Grid.ColumnDefinitions>
+                                            <ui:SymbolIcon Grid.Column="0" Symbol="Speaker224" FontSize="17" Margin="0,0,12,0"
+                                                           Foreground="{Binding SelectedNavigationIndex, Converter={StaticResource NavForegroundConverter}, ConverterParameter=5}"/>
+                                            <TextBlock Grid.Column="1" Text="Vibración &amp; Luces" FontSize="13" FontWeight="SemiBold" VerticalAlignment="Center"
+                                                       Foreground="{Binding SelectedNavigationIndex, Converter={StaticResource NavForegroundConverter}, ConverterParameter=5}"/>
+                                            <Border Grid.Column="2" Width="4" Height="16" CornerRadius="2"
+                                                    Background="{Binding SelectedNavigationIndex, Converter={StaticResource NavIndicatorConverter}, ConverterParameter=5}"/>
+                                        </Grid>
+                                    </Border>
+                                </ControlTemplate>
+                            </Button.Template>
+                        </Button>
+
+                        <!-- Item 6: Dispositivos & Hex -->
+                        <Button Command="{Binding NavigateCommand}" CommandParameter="6" Cursor="Hand" Margin="0,2">
+                            <Button.Template>
+                                <ControlTemplate TargetType="Button">
+                                    <Border CornerRadius="8" Background="{Binding SelectedNavigationIndex, Converter={StaticResource NavBgConverter}, ConverterParameter=6}" Padding="12,10">
+                                        <Grid>
+                                            <Grid.ColumnDefinitions>
+                                                <ColumnDefinition Width="Auto"/>
+                                                <ColumnDefinition Width="*"/>
+                                                <ColumnDefinition Width="Auto"/>
+                                            </Grid.ColumnDefinitions>
+                                            <ui:SymbolIcon Grid.Column="0" Symbol="Bluetooth24" FontSize="17" Margin="0,0,12,0"
+                                                           Foreground="{Binding SelectedNavigationIndex, Converter={StaticResource NavForegroundConverter}, ConverterParameter=6}"/>
+                                            <TextBlock Grid.Column="1" Text="Dispositivos &amp; Hex" FontSize="13" FontWeight="SemiBold" VerticalAlignment="Center"
+                                                       Foreground="{Binding SelectedNavigationIndex, Converter={StaticResource NavForegroundConverter}, ConverterParameter=6}"/>
+                                            <Border Grid.Column="2" Width="4" Height="16" CornerRadius="2"
+                                                    Background="{Binding SelectedNavigationIndex, Converter={StaticResource NavIndicatorConverter}, ConverterParameter=6}"/>
+                                        </Grid>
+                                    </Border>
+                                </ControlTemplate>
+                            </Button.Template>
+                        </Button>
+                    </StackPanel>
+                </ScrollViewer>
+
+                <!-- Pie del Sidebar: Ayuda y Estado del Mando Conectado -->
+                <StackPanel Grid.Row="2" Margin="12,0,12,14">
+                    <!-- Botón Ayuda -->
+                    <Button Command="{Binding NavigateCommand}" CommandParameter="7" Cursor="Hand" Margin="0,0,0,12">
+                        <Button.Template>
+                            <ControlTemplate TargetType="Button">
+                                <Border CornerRadius="8" Background="{Binding SelectedNavigationIndex, Converter={StaticResource NavBgConverter}, ConverterParameter=7}" Padding="10,8">
+                                    <StackPanel Orientation="Horizontal">
+                                        <ui:SymbolIcon Symbol="QuestionCircle24" FontSize="16" Margin="0,0,10,0" Foreground="#8898AA"/>
+                                        <TextBlock Text="Ayuda" FontSize="12" FontWeight="SemiBold" Foreground="#8898AA" VerticalAlignment="Center"/>
+                                    </StackPanel>
+                                </Border>
+                            </ControlTemplate>
+                        </Button.Template>
+                    </Button>
+
+                    <!-- Tarjeta Informativa del Dispositivo Conectado -->
+                    <Border CornerRadius="8" Background="#141824" BorderBrush="#222A3A" BorderThickness="1" Padding="12,10">
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="Auto"/>
+                            </Grid.ColumnDefinitions>
+                            <StackPanel Grid.Column="0">
+                                <TextBlock Text="{Binding CurrentDeviceDisplayName}" FontWeight="Bold" FontSize="12" Foreground="White" TextTrimming="CharacterEllipsis"/>
+                                <TextBlock Text="{Binding CurrentDeviceConnectionText}" FontSize="10" Foreground="#00C3FF" Margin="0,2,0,0"/>
+                            </StackPanel>
+                            <Border Grid.Column="1" Width="10" Height="10" CornerRadius="5"
+                                    Background="{Binding ConnectionBadgeBrush}" VerticalAlignment="Center" Margin="6,0,0,0"/>
+                        </Grid>
+                    </Border>
+
+                    <TextBlock Text="Control v1.0.0" FontSize="9" Foreground="#556075" HorizontalAlignment="Center" Margin="0,8,0,0"/>
+                </StackPanel>
+            </Grid>
+        </Border>
+
+        <!-- ========================================== -->
+        <!-- ÁREA PRINCIPAL DE CONTENIDO                -->
+        <!-- ========================================== -->
+        <Grid Grid.Column="1">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto"/> <!-- Barra de Título Superior -->
+                <RowDefinition Height="*"/>    <!-- Contenido Cambiante -->
+            </Grid.RowDefinitions>
+
+            <!-- BARRA SUPERIOR (HEADER ESTILO CAPTURA) -->
+            <Border Grid.Row="0" Background="#0C0E14" Padding="24,18,24,12">
+                <Grid>
+                    <!-- Izquierda: Categoría pequeña y Título grande -->
+                    <StackPanel VerticalAlignment="Center" HorizontalAlignment="Left">
+                        <TextBlock Text="{Binding ActivePageCategory}" FontSize="10" FontWeight="Bold" Foreground="#7E8B9F"/>
+                        <TextBlock Text="{Binding ActivePageTitle}" FontSize="24" FontWeight="Bold" Foreground="#FFFFFF" Margin="0,2,0,0"/>
+                    </StackPanel>
+
+                    <!-- Derecha: Selector Rápido de Dispositivo y Estado En Vivo -->
+                    <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" VerticalAlignment="Center">
+                        <!-- Indicador Entrada en vivo -->
+                        <Border Background="#121822" CornerRadius="16" Padding="10,5" Margin="0,0,12,0" BorderBrush="#1C2636" BorderThickness="1">
+                            <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                                <Border Width="7" Height="7" CornerRadius="4" Background="#00E599" Margin="0,0,7,0"/>
+                                <TextBlock Text="Entrada en vivo" FontSize="11" Foreground="#A0B0C4" FontWeight="SemiBold"/>
+                            </StackPanel>
+                        </Border>
+
+                        <!-- Selector de Mando (Amplio y sin recortes de texto) -->
+                        <ComboBox Width="360" MinHeight="36" Height="36" Margin="0,0,8,0"
+                                  ItemsSource="{Binding Devices}"
+                                  SelectedItem="{Binding SelectedDevice}"
+                                  Background="#151924" Foreground="White"
+                                  FontSize="12" Padding="10,6"
+                                  VerticalContentAlignment="Center"
+                                  ToolTip="Dispositivo de control seleccionado">
+                            <ComboBox.ItemTemplate>
+                                <DataTemplate>
+                                    <TextBlock Text="{Binding DisplayTitle}" ToolTip="{Binding DisplayTitle}"
+                                               VerticalAlignment="Center" TextTrimming="CharacterEllipsis"/>
+                                </DataTemplate>
+                            </ComboBox.ItemTemplate>
+                        </ComboBox>
+
+                        <!-- Refrescar -->
+                        <Button Style="{StaticResource SecondaryBtn}" Command="{Binding RefreshDevicesCommand}" Height="36" Padding="10,6" Margin="0,0,8,0" ToolTip="Buscar dispositivos HID">
+                            <ui:SymbolIcon Symbol="ArrowClockwise24" FontSize="15"/>
+                        </Button>
+
+                        <!-- Conectar / Desconectar -->
+                        <Button Style="{StaticResource ActionBtn}" Command="{Binding ConnectCommand}" Height="36" Padding="14,6"
+                                Visibility="{Binding IsConnected, Converter={StaticResource InverseBoolToVis}}" ToolTip="Conectar al mando seleccionado">
+                            <StackPanel Orientation="Horizontal">
+                                <ui:SymbolIcon Symbol="Flash24" FontSize="14" Margin="0,0,6,0"/>
+                                <TextBlock Text="Conectar" FontSize="12" FontWeight="SemiBold"/>
+                            </StackPanel>
+                        </Button>
+
+                        <Button Style="{StaticResource DangerBtn}" Command="{Binding DisconnectCommand}" Height="36" Padding="14,6"
+                                Visibility="{Binding IsConnected, Converter={StaticResource BoolToVis}}" ToolTip="Desconectar mando">
+                            <TextBlock Text="Desconectar" FontSize="12" FontWeight="SemiBold"/>
+                        </Button>
+                    </StackPanel>
+                </Grid>
+            </Border>
+
+            <!-- VISTAS REORGANIZADAS LIMPIAS -->
+            <Grid Grid.Row="1" Margin="24,6,24,20">
+
+                <!-- ========================================== -->
+                <!-- PÁGINA 0: PRUEBA (ESTILO IDÉNTICO A IMAGEN) -->
+                <!-- ========================================== -->
+                <Grid Visibility="{Binding SelectedNavigationIndex, Converter={StaticResource IntToVis}, ConverterParameter=0}">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="380"/>
+                    </Grid.ColumnDefinitions>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="*"/>
+                    </Grid.RowDefinitions>
+
+                    <!-- FILA 1, COL 0: CARD 1 - STICKS ANALÓGICOS (RADAR TARGETS) -->
+                    <Border Grid.Row="0" Grid.Column="0" Style="{StaticResource CardBorder}" Margin="0,0,14,14">
+                        <Grid>
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="Auto"/> <!-- Encabezado -->
+                                <RowDefinition Height="Auto"/> <!-- Gráficos de Sticks -->
+                                <RowDefinition Height="Auto"/> <!-- Pie del Card -->
+                            </Grid.RowDefinitions>
+
+                            <!-- Encabezado del Card -->
+                            <Grid Grid.Row="0" Margin="0,0,0,12">
+                                <StackPanel>
+                                    <TextBlock Text="Sticks analógicos" FontSize="15" FontWeight="Bold" Foreground="White"/>
+                                    <TextBlock Text="Movimiento y posición en tiempo real" FontSize="11" Foreground="#7E8B9F" Margin="0,2,0,0"/>
+                                </StackPanel>
+                                <Button Command="{Binding CalibrateSensorsCommand}" Style="{StaticResource SecondaryBtn}"
+                                        HorizontalAlignment="Right" VerticalAlignment="Top" Padding="8,4" ToolTip="Calibrar y recentrar">
+                                    <ui:SymbolIcon Symbol="ArrowClockwise24" FontSize="13"/>
+                                </Button>
+                            </Grid>
+
+                            <!-- Contenedor Dual de Radar Targets -->
+                            <Grid Grid.Row="1" Margin="0,6,0,10">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*"/>
+                                    <ColumnDefinition Width="*"/>
+                                </Grid.ColumnDefinitions>
+
+                                <!-- STICK IZQUIERDO -->
+                                <StackPanel Grid.Column="0" Margin="0,0,10,0">
+                                    <Grid Margin="10,0,10,8">
+                                        <TextBlock Text="STICK IZQUIERDO" FontSize="11" FontWeight="Bold" Foreground="#8898AA"/>
+                                        <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" VerticalAlignment="Center">
+                                            <Border Width="6" Height="6" CornerRadius="3" Background="{Binding LeftStickStatusBrush}" Margin="0,0,6,0"/>
+                                            <TextBlock Text="{Binding LeftStickStatusText}" FontSize="10" FontWeight="Bold" Foreground="{Binding LeftStickStatusBrush}"/>
+                                        </StackPanel>
+                                    </Grid>
+
+                                    <!-- Radar Reticle Gráfico Stick L -->
+                                    <controls:ThumbstickControl Width="180" Height="180"
+                                                               StickX="{Binding State.LeftStickX}"
+                                                               StickY="{Binding State.LeftStickY}"
+                                                               IsClicked="{Binding State.L3}"
+                                                               HorizontalAlignment="Center"/>
+
+                                    <!-- Valores X / Y -->
+                                    <Grid Margin="20,8,20,0">
+                                        <StackPanel Orientation="Horizontal">
+                                            <TextBlock Text="X: " FontSize="11" Foreground="#667790"/>
+                                            <TextBlock Text="{Binding State.LeftStickX, StringFormat='{}{0:+0.00;-0.00}'}" FontSize="11" FontWeight="Bold" Foreground="White"/>
+                                        </StackPanel>
+                                        <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
+                                            <TextBlock Text="Y: " FontSize="11" Foreground="#667790"/>
+                                            <TextBlock Text="{Binding State.LeftStickY, StringFormat='{}{0:+0.00;-0.00}'}" FontSize="11" FontWeight="Bold" Foreground="White"/>
+                                        </StackPanel>
+                                    </Grid>
+                                </StackPanel>
+
+                                <!-- STICK DERECHO -->
+                                <StackPanel Grid.Column="1" Margin="10,0,0,0">
+                                    <Grid Margin="10,0,10,8">
+                                        <TextBlock Text="STICK DERECHO" FontSize="11" FontWeight="Bold" Foreground="#8898AA"/>
+                                        <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" VerticalAlignment="Center">
+                                            <Border Width="6" Height="6" CornerRadius="3" Background="{Binding RightStickStatusBrush}" Margin="0,0,6,0"/>
+                                            <TextBlock Text="{Binding RightStickStatusText}" FontSize="10" FontWeight="Bold" Foreground="{Binding RightStickStatusBrush}"/>
+                                        </StackPanel>
+                                    </Grid>
+
+                                    <!-- Radar Reticle Gráfico Stick R -->
+                                    <controls:ThumbstickControl Width="180" Height="180"
+                                                               StickX="{Binding State.RightStickX}"
+                                                               StickY="{Binding State.RightStickY}"
+                                                               IsClicked="{Binding State.R3}"
+                                                               HorizontalAlignment="Center"/>
+
+                                    <!-- Valores X / Y -->
+                                    <Grid Margin="20,8,20,0">
+                                        <StackPanel Orientation="Horizontal">
+                                            <TextBlock Text="X: " FontSize="11" Foreground="#667790"/>
+                                            <TextBlock Text="{Binding State.RightStickX, StringFormat='{}{0:+0.00;-0.00}'}" FontSize="11" FontWeight="Bold" Foreground="White"/>
+                                        </StackPanel>
+                                        <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
+                                            <TextBlock Text="Y: " FontSize="11" Foreground="#667790"/>
+                                            <TextBlock Text="{Binding State.RightStickY, StringFormat='{}{0:+0.00;-0.00}'}" FontSize="11" FontWeight="Bold" Foreground="White"/>
+                                        </StackPanel>
+                                    </Grid>
+                                </StackPanel>
+                            </Grid>
+
+                            <!-- Pie del Card 1 -->
+                            <Grid Grid.Row="2" Margin="4,8,4,0">
+                                <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                                    <Border Width="6" Height="6" CornerRadius="3" Background="#5A6882" Margin="0,0,6,0"/>
+                                    <TextBlock Text="Zona muerta: ~10%" FontSize="10" Foreground="#7E8B9F"/>
+                                </StackPanel>
+                                <TextBlock Text="Radio: 100%" FontSize="10" Foreground="#7E8B9F" HorizontalAlignment="Right"/>
+                            </Grid>
+                        </Grid>
+                    </Border>
+
+                    <!-- FILA 2, COL 0: CARD 2 - TELEMETRÍA -->
+                    <Border Grid.Row="1" Grid.Column="0" Style="{StaticResource CardBorder}" Margin="0,0,14,0">
+                        <Grid>
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="Auto"/>
+                                <RowDefinition Height="*"/>
+                                <RowDefinition Height="Auto"/>
+                            </Grid.RowDefinitions>
+
+                            <Grid Grid.Row="0" Margin="0,0,0,12">
+                                <StackPanel>
+                                    <TextBlock Text="Telemetría" FontSize="15" FontWeight="Bold" Foreground="White"/>
+                                    <TextBlock Text="Estado del dispositivo" FontSize="11" Foreground="#7E8B9F" Margin="0,2,0,0"/>
+                                </StackPanel>
+                                <ui:SymbolIcon Symbol="Pulse24" FontSize="18" Foreground="#00C3FF" HorizontalAlignment="Right"/>
+                            </Grid>
+
+                            <!-- Métricas de Batería y Latencia -->
+                            <Grid Grid.Row="1" VerticalAlignment="Center" Margin="0,6,0,12">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*"/>
+                                    <ColumnDefinition Width="*"/>
+                                </Grid.ColumnDefinitions>
+
+                                <!-- Batería -->
+                                <StackPanel Grid.Column="0" Margin="0,0,14,0">
+                                    <StackPanel Orientation="Horizontal" Margin="0,0,0,6">
+                                        <ui:SymbolIcon Symbol="BatteryCharge24" FontSize="14" Foreground="#8898AA" Margin="0,0,6,0"/>
+                                        <TextBlock Text="Batería" FontSize="11" Foreground="#8898AA" FontWeight="SemiBold"/>
+                                    </StackPanel>
+                                    <TextBlock Text="{Binding State.BatteryPercentage, StringFormat='{}{0}%'}" FontSize="30" FontWeight="Bold" Foreground="White"/>
+                                    <ProgressBar Value="{Binding State.BatteryPercentage, Mode=OneWay}" Maximum="100" Minimum="0"
+                                                 Height="3" Background="#1D2434" Foreground="#00E599" BorderThickness="0" Margin="0,8,0,0"/>
+                                </StackPanel>
+
+                                <!-- Latencia / Polling Rate -->
+                                <StackPanel Grid.Column="1" Margin="14,0,0,0">
+                                    <StackPanel Orientation="Horizontal" Margin="0,0,0,6">
+                                        <ui:SymbolIcon Symbol="Timer24" FontSize="14" Foreground="#8898AA" Margin="0,0,6,0"/>
+                                        <TextBlock Text="Latencia" FontSize="11" Foreground="#8898AA" FontWeight="SemiBold"/>
+                                    </StackPanel>
+                                    <TextBlock Text="{Binding LatencyText}" FontSize="30" FontWeight="Bold" Foreground="White"/>
+                                    <ProgressBar Value="{Binding PollingRateHz, Mode=OneWay}" Maximum="1000" Minimum="0"
+                                                 Height="3" Background="#1D2434" Foreground="#00C3FF" BorderThickness="0" Margin="0,8,0,0"/>
+                                    <TextBlock Text="{Binding PollingRateHz, StringFormat='{}Refresco: {0:F0} Hz'}" FontSize="10" Foreground="#7E8B9F" Margin="0,4,0,0"/>
+                                </StackPanel>
+                            </Grid>
+
+                            <!-- Pie de Telemetría -->
+                            <Grid Grid.Row="2" Margin="0,6,0,0">
+                                <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                                    <Border Width="6" Height="6" CornerRadius="3" Background="{Binding ConnectionBadgeBrush}" Margin="0,0,6,0"/>
+                                    <TextBlock Text="{Binding ConnectionStatusText}" FontSize="11" Foreground="#A0B0C4"/>
+                                </StackPanel>
+                            </Grid>
+                        </Grid>
+                    </Border>
+
+                    <!-- FILA 1, COL 1: CARD 3 - GATILLOS ANALÓGICOS -->
+                    <Border Grid.Row="0" Grid.Column="1" Style="{StaticResource CardBorder}" Margin="0,0,0,14">
+                        <Grid>
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="Auto"/>
+                                <RowDefinition Height="Auto"/>
+                                <RowDefinition Height="Auto"/>
+                            </Grid.RowDefinitions>
+
+                            <Grid Grid.Row="0" Margin="0,0,0,14">
+                                <StackPanel>
+                                    <TextBlock Text="Gatillos" FontSize="15" FontWeight="Bold" Foreground="White"/>
+                                    <TextBlock Text="Presión de entrada" FontSize="11" Foreground="#7E8B9F" Margin="0,2,0,0"/>
+                                </StackPanel>
+                                <ui:SymbolIcon Symbol="Flash24" FontSize="18" Foreground="#FFB300" HorizontalAlignment="Right"/>
+                            </Grid>
+
+                            <!-- Medidores L2 y R2 Horizontales -->
+                            <StackPanel Grid.Row="1" Margin="0,4,0,12">
+                                <!-- Gatillo L2 -->
+                                <Grid Margin="0,0,0,4">
+                                    <TextBlock Text="L2 · Gatillo izquierdo" FontSize="11" Foreground="#A0B0C4" FontWeight="SemiBold"/>
+                                    <TextBlock Text="{Binding State.RawL2, Converter={StaticResource TriggerPercentOnly}}"
+                                               FontSize="11" FontWeight="Bold" Foreground="White" HorizontalAlignment="Right"/>
+                                </Grid>
+                                <ProgressBar Value="{Binding State.RawL2, Mode=OneWay}" Maximum="255" Minimum="0"
+                                             Height="8" Background="#1D2434" Foreground="#00C3FF" BorderThickness="0"/>
+                                <Grid Margin="0,2,0,14">
+                                    <TextBlock Text="0" FontSize="8" Foreground="#556075"/>
+                                    <TextBlock Text="50" FontSize="8" Foreground="#556075" HorizontalAlignment="Center"/>
+                                    <TextBlock Text="100" FontSize="8" Foreground="#556075" HorizontalAlignment="Right"/>
+                                </Grid>
+
+                                <!-- Gatillo R2 -->
+                                <Grid Margin="0,0,0,4">
+                                    <TextBlock Text="R2 · Gatillo derecho" FontSize="11" Foreground="#A0B0C4" FontWeight="SemiBold"/>
+                                    <TextBlock Text="{Binding State.RawR2, Converter={StaticResource TriggerPercentOnly}}"
+                                               FontSize="11" FontWeight="Bold" Foreground="White" HorizontalAlignment="Right"/>
+                                </Grid>
+                                <ProgressBar Value="{Binding State.RawR2, Mode=OneWay}" Maximum="255" Minimum="0"
+                                             Height="8" Background="#1D2434" Foreground="#FF3355" BorderThickness="0"/>
+                                <Grid Margin="0,2,0,0">
+                                    <TextBlock Text="0" FontSize="8" Foreground="#556075"/>
+                                    <TextBlock Text="50" FontSize="8" Foreground="#556075" HorizontalAlignment="Center"/>
+                                    <TextBlock Text="100" FontSize="8" Foreground="#556075" HorizontalAlignment="Right"/>
+                                </Grid>
+                            </StackPanel>
+
+                            <!-- Pie de Gatillos -->
+                            <Grid Grid.Row="2" Margin="0,4,0,0">
+                                <TextBlock Text="Rango de recorrido" FontSize="10" Foreground="#7E8B9F"/>
+                                <TextBlock Text="0 — 100%" FontSize="10" Foreground="#7E8B9F" HorizontalAlignment="Right"/>
+                            </Grid>
+                        </Grid>
+                    </Border>
+
+                    <!-- FILA 2, COL 1: CARD 4 - BOTONES DE ACCIÓN (CON ICONOS EXACTOS DEL USUARIO) -->
+                    <Border Grid.Row="1" Grid.Column="1" Style="{StaticResource CardBorder}">
+                        <Grid>
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="Auto"/>
+                                <RowDefinition Height="*"/>
+                                <RowDefinition Height="Auto"/>
+                            </Grid.RowDefinitions>
+
+                            <Grid Grid.Row="0" Margin="0,0,0,14">
+                                <StackPanel>
+                                    <TextBlock Text="Botones" FontSize="15" FontWeight="Bold" Foreground="White"/>
+                                    <TextBlock Text="Última entrada detectada" FontSize="11" Foreground="#7E8B9F" Margin="0,2,0,0"/>
+                                </StackPanel>
+                                <ui:SymbolIcon Symbol="Games24" FontSize="18" Foreground="#8898AA" HorizontalAlignment="Right"/>
+                            </Grid>
+
+                            <!-- 4 Botones de Acción (Triángulo, Círculo, Cruz, Cuadrado) -->
+                            <UniformGrid Grid.Row="1" Columns="4" VerticalAlignment="Center" Margin="0,4,0,12">
+                                <!-- Triángulo Verde -->
+                                <Border Margin="3" CornerRadius="8" Padding="6,12" BorderThickness="1">
+                                    <Border.Style>
+                                        <Style TargetType="Border">
+                                            <Setter Property="Background" Value="#151A24"/>
+                                            <Setter Property="BorderBrush" Value="#252D40"/>
+                                            <Style.Triggers>
+                                                <DataTrigger Binding="{Binding IsTrianglePressed}" Value="True">
+                                                    <Setter Property="Background" Value="#3500DDAA"/>
+                                                    <Setter Property="BorderBrush" Value="#00DDAA"/>
+                                                </DataTrigger>
+                                            </Style.Triggers>
+                                        </Style>
+                                    </Border.Style>
+                                    <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center">
+                                        <Path Data="M 0 16 L 10 0 L 20 16 Z" 
+                                              Stroke="#00DDAA" StrokeThickness="2" Width="16" Height="16" HorizontalAlignment="Center">
+                                            <Path.Style>
+                                                <Style TargetType="Path">
+                                                    <Setter Property="Fill" Value="Transparent"/>
+                                                    <Style.Triggers>
+                                                        <DataTrigger Binding="{Binding IsTrianglePressed}" Value="True">
+                                                            <Setter Property="Fill" Value="#00DDAA"/>
+                                                        </DataTrigger>
+                                                    </Style.Triggers>
+                                                </Style>
+                                            </Path.Style>
+                                        </Path>
+                                        <TextBlock Text="TRIÁNGULO" FontSize="8" FontWeight="Bold" Foreground="#00DDAA" Margin="0,8,0,0" HorizontalAlignment="Center"/>
+                                    </StackPanel>
+                                </Border>
+
+                                <!-- Círculo Rojo -->
+                                <Border Margin="3" CornerRadius="8" Padding="6,12" BorderThickness="1">
+                                    <Border.Style>
+                                        <Style TargetType="Border">
+                                            <Setter Property="Background" Value="#151A24"/>
+                                            <Setter Property="BorderBrush" Value="#252D40"/>
+                                            <Style.Triggers>
+                                                <DataTrigger Binding="{Binding IsCirclePressed}" Value="True">
+                                                    <Setter Property="Background" Value="#35FF3355"/>
+                                                    <Setter Property="BorderBrush" Value="#FF3355"/>
+                                                </DataTrigger>
+                                            </Style.Triggers>
+                                        </Style>
+                                    </Border.Style>
+                                    <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center">
+                                        <Ellipse Width="16" Height="16" 
+                                                 Stroke="#FF3355" StrokeThickness="2" HorizontalAlignment="Center">
+                                            <Ellipse.Style>
+                                                <Style TargetType="Ellipse">
+                                                    <Setter Property="Fill" Value="Transparent"/>
+                                                    <Style.Triggers>
+                                                        <DataTrigger Binding="{Binding IsCirclePressed}" Value="True">
+                                                            <Setter Property="Fill" Value="#FF3355"/>
+                                                        </DataTrigger>
+                                                    </Style.Triggers>
+                                                </Style>
+                                            </Ellipse.Style>
+                                        </Ellipse>
+                                        <TextBlock Text="CÍRCULO" FontSize="8" FontWeight="Bold" Foreground="#FF3355" Margin="0,8,0,0" HorizontalAlignment="Center"/>
+                                    </StackPanel>
+                                </Border>
+
+                                <!-- Cruz Azul (X) -->
+                                <Border Margin="3" CornerRadius="8" Padding="6,12" BorderThickness="1">
+                                    <Border.Style>
+                                        <Style TargetType="Border">
+                                            <Setter Property="Background" Value="#151A24"/>
+                                            <Setter Property="BorderBrush" Value="#252D40"/>
+                                            <Style.Triggers>
+                                                <DataTrigger Binding="{Binding IsCrossPressed}" Value="True">
+                                                    <Setter Property="Background" Value="#350080FF"/>
+                                                    <Setter Property="BorderBrush" Value="#0080FF"/>
+                                                </DataTrigger>
+                                            </Style.Triggers>
+                                        </Style>
+                                    </Border.Style>
+                                    <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center">
+                                        <Path Data="M 0 0 L 16 16 M 16 0 L 0 16" 
+                                              Stroke="#0080FF" StrokeThickness="2" Width="16" Height="16" HorizontalAlignment="Center">
+                                            <Path.Style>
+                                                <Style TargetType="Path">
+                                                    <Style.Triggers>
+                                                        <DataTrigger Binding="{Binding IsCrossPressed}" Value="True">
+                                                            <Setter Property="StrokeThickness" Value="3.5"/>
+                                                        </DataTrigger>
+                                                    </Style.Triggers>
+                                                </Style>
+                                            </Path.Style>
+                                        </Path>
+                                        <TextBlock Text="EQUIS" FontSize="8" FontWeight="Bold" Foreground="#0080FF" Margin="0,8,0,0" HorizontalAlignment="Center"/>
+                                    </StackPanel>
+                                </Border>
+
+                                <!-- Cuadrado Rosa -->
+                                <Border Margin="3" CornerRadius="8" Padding="6,12" BorderThickness="1">
+                                    <Border.Style>
+                                        <Style TargetType="Border">
+                                            <Setter Property="Background" Value="#151A24"/>
+                                            <Setter Property="BorderBrush" Value="#252D40"/>
+                                            <Style.Triggers>
+                                                <DataTrigger Binding="{Binding IsSquarePressed}" Value="True">
+                                                    <Setter Property="Background" Value="#35FF44CC"/>
+                                                    <Setter Property="BorderBrush" Value="#FF44CC"/>
+                                                </DataTrigger>
+                                            </Style.Triggers>
+                                        </Style>
+                                    </Border.Style>
+                                    <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center">
+                                        <Rectangle Width="16" Height="16" 
+                                                   Stroke="#FF44CC" StrokeThickness="2" RadiusX="2" RadiusY="2" HorizontalAlignment="Center">
+                                            <Rectangle.Style>
+                                                <Style TargetType="Rectangle">
+                                                    <Setter Property="Fill" Value="Transparent"/>
+                                                    <Style.Triggers>
+                                                        <DataTrigger Binding="{Binding IsSquarePressed}" Value="True">
+                                                            <Setter Property="Fill" Value="#FF44CC"/>
+                                                        </DataTrigger>
+                                                    </Style.Triggers>
+                                                </Style>
+                                            </Rectangle.Style>
+                                        </Rectangle>
+                                        <TextBlock Text="CUADRADO" FontSize="8" FontWeight="Bold" Foreground="#FF44CC" Margin="0,8,0,0" HorizontalAlignment="Center"/>
+                                    </StackPanel>
+                                </Border>
+                            </UniformGrid>
+
+                            <!-- Pie de Botones con Estado en Tiempo Real -->
+                            <Grid Grid.Row="2" Margin="0,4,0,0">
+                                <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                                    <Border Width="6" Height="6" CornerRadius="3" Background="#00E599" Margin="0,0,6,0"/>
+                                    <TextBlock Text="{Binding LastPressedButtonText}" FontSize="11" Foreground="#A0B0C4" FontWeight="SemiBold"/>
+                                </StackPanel>
+                            </Grid>
+                        </Grid>
+                    </Border>
+                </Grid>
+
+                <!-- ========================================== -->
+                <!-- PÁGINA 1: TEST DE CIRCULARIDAD             -->
+                <!-- ========================================== -->
+                <Grid Visibility="{Binding SelectedNavigationIndex, Converter={StaticResource IntToVis}, ConverterParameter=1}">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="380"/>
+                    </Grid.ColumnDefinitions>
+
+                    <!-- Panel Izquierdo: Visualizador Gráfico de Circularidad -->
+                    <Border Grid.Column="0" Style="{StaticResource CardBorder}" Margin="0,0,14,0">
+                        <Grid>
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="Auto"/>
+                                <RowDefinition Height="*"/>
+                                <RowDefinition Height="Auto"/>
+                            </Grid.RowDefinitions>
+
+                            <Grid Grid.Row="0" Margin="0,0,0,12">
+                                <StackPanel>
+                                    <TextBlock Text="BENCHMARK DE CIRCULARIDAD Y ZONAS MUERTAS" FontWeight="Bold" FontSize="13" Foreground="#00C3FF"/>
+                                    <TextBlock Text="Mide la precisión radial, deformación en esquinas (corner gating) y error del joystick." FontSize="11" Foreground="#8898AA" Margin="0,2,0,0"/>
+                                </StackPanel>
+                                <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" VerticalAlignment="Center">
+                                    <Border Background="#1C2438" CornerRadius="6" Padding="10,5" Margin="0,0,8,0">
+                                        <StackPanel Orientation="Horizontal">
+                                            <TextBlock Text="X: " Foreground="#8898AA" FontWeight="SemiBold"/>
+                                            <TextBlock Text="{Binding CurrentTestStickX, StringFormat='{}{0:+0.000;-0.000; 0.000}'}" FontWeight="Bold" Foreground="#00C3FF" Margin="0,0,10,0"/>
+                                            <TextBlock Text="Y: " Foreground="#8898AA" FontWeight="SemiBold"/>
+                                            <TextBlock Text="{Binding CurrentTestStickY, StringFormat='{}{0:+0.000;-0.000; 0.000}'}" FontWeight="Bold" Foreground="#00C3FF"/>
+                                        </StackPanel>
+                                    </Border>
+                                </StackPanel>
+                            </Grid>
+
+                            <!-- Control Gráfico de Circularidad -->
+                            <controls:CircularityControl Grid.Row="1"
+                                                         StickX="{Binding CurrentTestStickX}"
+                                                         StickY="{Binding CurrentTestStickY}"
+                                                         SectorPoints="{Binding CircularitySectorRadii}"
+                                                         SamplePoints="{Binding CircularitySamplePoints}"
+                                                         IsCompleted="{Binding IsCircularityCompleted}"
+                                                         MinHeight="360" MinWidth="360"
+                                                         HorizontalAlignment="Stretch" VerticalAlignment="Stretch"/>
+
+                            <TextBlock Grid.Row="2" Text="💡 Gire la palanca 1 sola vuelta completa (360°) pegada al borde exterior. El benchmark finalizará automáticamente."
+                                       Foreground="#8898AA" FontSize="11" HorizontalAlignment="Center" Margin="0,10,0,0"/>
+                        </Grid>
+                    </Border>
+
+                    <!-- Panel Derecho: Controles y Métricas de Rendimiento -->
+                    <StackPanel Grid.Column="1">
+                        <!-- Tarjeta de Control del Test -->
+                        <Border Style="{StaticResource CardBorder}" Margin="0,0,0,14">
+                            <StackPanel>
+                                <TextBlock Text="CONFIGURACIÓN DEL TEST" FontWeight="Bold" FontSize="13" Foreground="#00C3FF" Margin="0,0,0,12"/>
+
+                                <Grid Margin="0,0,0,12">
+                                    <TextBlock Text="Palanca a Probar:" VerticalAlignment="Center" Foreground="#8898AA" FontWeight="SemiBold"/>
+                                    <ComboBox ItemsSource="{Binding CircularityStickOptions}"
+                                              SelectedItem="{Binding SelectedCircularityStick}"
+                                              HorizontalAlignment="Right" Width="220" MinHeight="36" Height="36"
+                                              Padding="10,6" FontSize="12"
+                                              Background="#1A2030" Foreground="White" VerticalContentAlignment="Center"/>
+                                </Grid>
+
+                                <!-- Progreso de 1 Vuelta (360°) -->
+                                <Grid Margin="0,0,0,6">
+                                    <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                                        <ui:SymbolIcon Symbol="ArrowSync24" FontSize="13" Foreground="#00C3FF" Margin="0,0,6,0"/>
+                                        <TextBlock Text="Progreso de 1 Vuelta (360°):" FontSize="11" Foreground="#8898AA" FontWeight="SemiBold"/>
+                                    </StackPanel>
+                                    <TextBlock Text="{Binding CircularityLapProgress, StringFormat='{}{0:F0}%'}" HorizontalAlignment="Right" FontWeight="Bold" Foreground="#00C3FF" FontSize="11"/>
+                                </Grid>
+                                <ProgressBar Value="{Binding CircularityLapProgress, Mode=OneWay}" Maximum="100" Minimum="0"
+                                             Height="5" Background="#1D2434" Foreground="#00E599" BorderThickness="0" Margin="0,0,0,14"/>
+
+                                <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" Margin="0,4,0,0">
+                                    <Button Content="▶ Iniciar" Style="{StaticResource ActionBtn}"
+                                            Height="36" Padding="14,6"
+                                            Command="{Binding StartCircularityTestCommand}" Margin="0,0,8,0"/>
+                                    <Button Content="⏹ Detener" Style="{StaticResource DangerBtn}"
+                                            Height="36" Padding="14,6"
+                                            Command="{Binding StopCircularityTestCommand}" Margin="0,0,8,0"/>
+                                    <Button Content="🔄 Reiniciar" Style="{StaticResource SecondaryBtn}"
+                                            Height="36" Padding="14,6"
+                                            Command="{Binding ResetCircularityTestCommand}"/>
+                                </StackPanel>
+                            </StackPanel>
+                        </Border>
+
+                        <!-- Tarjeta de Resultados del Benchmark -->
+                        <Border Style="{StaticResource CardBorder}" Margin="0,0,0,14">
+                            <StackPanel>
+                                <TextBlock Text="RESULTADOS DEL BENCHMARK" FontWeight="Bold" FontSize="13" Foreground="#00C3FF" Margin="0,0,0,14"/>
+
+                                <Border Background="#141A28" CornerRadius="8" Padding="14,12" BorderBrush="#25324A" BorderThickness="1" Margin="0,0,0,14">
+                                    <Grid>
+                                        <StackPanel VerticalAlignment="Center">
+                                            <TextBlock Text="ERROR PROMEDIO" FontSize="10" FontWeight="Bold" Foreground="#8898AA"/>
+                                            <TextBlock Text="{Binding CircularityAverageError, StringFormat='{}{0:F1}%'}"
+                                                       FontSize="28" FontWeight="Bold" Foreground="#FFFFFF"/>
+                                        </StackPanel>
+
+                                        <Border HorizontalAlignment="Right" VerticalAlignment="Center"
+                                                Background="{Binding CircularityRatingBrush}"
+                                                CornerRadius="6" Padding="12,6">
+                                            <TextBlock Text="{Binding CircularityVerdict}" FontWeight="Bold" FontSize="12" Foreground="#0B0E14"/>
+                                        </Border>
+                                    </Grid>
+                                </Border>
+
+                                <Grid Margin="0,0,0,6">
+                                    <TextBlock Text="Cobertura de 360°:" Foreground="#8898AA" FontSize="11"/>
+                                    <TextBlock Text="{Binding CircularityCoverage, StringFormat='{}{0:F0}%'}" HorizontalAlignment="Right" FontWeight="Bold" Foreground="#00C3FF" FontSize="11"/>
+                                </Grid>
+
+                                <Grid Margin="0,0,0,6">
+                                    <TextBlock Text="Radio Máximo:" Foreground="#8898AA" FontSize="11"/>
+                                    <TextBlock Text="{Binding CircularityMaxRadius, StringFormat='{}{0:F2}'}" HorizontalAlignment="Right" FontWeight="Bold" Foreground="White" FontSize="11"/>
+                                </Grid>
+
+                                <Grid Margin="0,0,0,6">
+                                    <TextBlock Text="Radio Mínimo:" Foreground="#8898AA" FontSize="11"/>
+                                    <TextBlock Text="{Binding CircularityMinRadius, StringFormat='{}{0:F2}'}" HorizontalAlignment="Right" FontWeight="Bold" Foreground="White" FontSize="11"/>
+                                </Grid>
+                            </StackPanel>
+                        </Border>
+
+                        <!-- Escala de Calidad -->
+                        <Border Style="{StaticResource CardBorder}">
+                            <StackPanel>
+                                <TextBlock Text="ℹ️ Diagnóstico de Calidad:" FontWeight="Bold" FontSize="11" Foreground="#FFB300" Margin="0,0,0,4"/>
+                                <TextBlock Text="• &lt; 8%: Excelente (sensores Hall Effect o potenciómetros originales)." FontSize="10" Foreground="#A0B0C4" TextWrapping="Wrap" Margin="0,0,0,2"/>
+                                <TextBlock Text="• 8% - 15%: Buena / Aceptable (clones estándar con poca distorsión)." FontSize="10" Foreground="#A0B0C4" TextWrapping="Wrap" Margin="0,0,0,2"/>
+                                <TextBlock Text="• &gt; 15%: Deficiente (deformación cuadrada o zonas muertas amplias)." FontSize="10" Foreground="#A0B0C4" TextWrapping="Wrap"/>
+                            </StackPanel>
+                        </Border>
+                    </StackPanel>
+                </Grid>
+
+                <!-- ========================================== -->
+                <!-- PÁGINA 2: GATILLOS ADAPTATIVOS             -->
+                <!-- ========================================== -->
+                <Grid Visibility="{Binding SelectedNavigationIndex, Converter={StaticResource IntToVis}, ConverterParameter=2}">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="400"/>
+                    </Grid.ColumnDefinitions>
+
+                    <Border Grid.Column="0" Style="{StaticResource CardBorder}" Margin="0,0,14,0">
+                        <Grid>
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="Auto"/>
+                                <RowDefinition Height="*"/>
+                                <RowDefinition Height="Auto"/>
+                            </Grid.RowDefinitions>
+
+                            <TextBlock Grid.Row="0" Text="MEDICIÓN ANALÓGICA DE GATILLOS" FontWeight="Bold" FontSize="13" Foreground="#00C3FF" Margin="0,0,0,14"/>
+
+                            <Grid Grid.Row="1">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*"/>
+                                    <ColumnDefinition Width="*"/>
+                                </Grid.ColumnDefinitions>
+
+                                <!-- L2 -->
+                                <Border Grid.Column="0" Background="#161B26" CornerRadius="8" Padding="16" Margin="0,0,7,0">
+                                    <Grid>
+                                        <Grid.RowDefinitions>
+                                            <RowDefinition Height="Auto"/>
+                                            <RowDefinition Height="*"/>
+                                            <RowDefinition Height="Auto"/>
+                                        </Grid.RowDefinitions>
+                                        <TextBlock Grid.Row="0" Text="GATILLO L2" FontWeight="Bold" FontSize="13" Foreground="#00C3FF" HorizontalAlignment="Center"/>
+                                        
+                                        <!-- Barra de Gatillo Vertical Completa L2 -->
+                                        <controls:TriggerBarControl Grid.Row="1" Width="96" Margin="0,16"
+                                                                    Value="{Binding State.RawL2}" Maximum="255"
+                                                                    BarBrush="{StaticResource L2TriggerBrush}"
+                                                                    HorizontalAlignment="Center" VerticalAlignment="Stretch"/>
+
+                                        <Border Grid.Row="2" Background="#0C1018" CornerRadius="6" Padding="14,6"
+                                                BorderBrush="#1E283C" BorderThickness="1" HorizontalAlignment="Center">
+                                            <TextBlock Text="{Binding State.RawL2, Converter={StaticResource TriggerPercent}}"
+                                                       FontWeight="Bold" FontSize="13" Foreground="White" HorizontalAlignment="Center"/>
+                                        </Border>
+                                    </Grid>
+                                </Border>
+
+                                <!-- R2 -->
+                                <Border Grid.Column="1" Background="#161B26" CornerRadius="8" Padding="16" Margin="7,0,0,0">
+                                    <Grid>
+                                        <Grid.RowDefinitions>
+                                            <RowDefinition Height="Auto"/>
+                                            <RowDefinition Height="*"/>
+                                            <RowDefinition Height="Auto"/>
+                                        </Grid.RowDefinitions>
+                                        <TextBlock Grid.Row="0" Text="GATILLO R2" FontWeight="Bold" FontSize="13" Foreground="#FF3355" HorizontalAlignment="Center"/>
+                                        
+                                        <!-- Barra de Gatillo Vertical Completa R2 -->
+                                        <controls:TriggerBarControl Grid.Row="1" Width="96" Margin="0,16"
+                                                                    Value="{Binding State.RawR2}" Maximum="255"
+                                                                    BarBrush="{StaticResource R2TriggerBrush}"
+                                                                    HorizontalAlignment="Center" VerticalAlignment="Stretch"/>
+
+                                        <Border Grid.Row="2" Background="#0C1018" CornerRadius="6" Padding="14,6"
+                                                BorderBrush="#1E283C" BorderThickness="1" HorizontalAlignment="Center">
+                                            <TextBlock Text="{Binding State.RawR2, Converter={StaticResource TriggerPercent}}"
+                                                       FontWeight="Bold" FontSize="13" Foreground="White" HorizontalAlignment="Center"/>
+                                        </Border>
+                                    </Grid>
+                                </Border>
+                            </Grid>
+
+                            <Border Grid.Row="2" Background="#161D2B" CornerRadius="6" Padding="12" Margin="0,14,0,0">
+                                <TextBlock Text="💡 Conecte por cable USB para enviar secuencias hápticas completas a clones de PS5." FontSize="11" Foreground="#A0B0C4"/>
+                            </Border>
+                        </Grid>
+                    </Border>
+
+                    <!-- Panel Configurador de Servos -->
+                    <Border Grid.Column="1" Style="{StaticResource CardBorder}">
+                        <StackPanel>
+                            <TextBlock Text="GENERADOR DE EFECTOS DUALSENSE" FontWeight="Bold" FontSize="13" Foreground="#00C3FF" Margin="0,0,0,14"/>
+
+                            <TextBlock Text="Efecto Predefinido:" Foreground="#8898AA" Margin="0,0,0,4"/>
+                            <ComboBox ItemsSource="{Binding TriggerPresets}" SelectedItem="{Binding SelectedTriggerPreset}"
+                                      Background="#1A2030" Foreground="White" MinHeight="36" Height="36" Padding="10,6" FontSize="12" Margin="0,0,0,12"/>
+
+                            <StackPanel Orientation="Horizontal" Margin="0,0,0,12">
+                                <CheckBox Content="Aplicar en L2" IsChecked="{Binding ApplyToLeft}" Foreground="#E0E6F0" Margin="0,0,16,0"/>
+                                <CheckBox Content="Aplicar en R2" IsChecked="{Binding ApplyToRight}" Foreground="#E0E6F0"/>
+                            </StackPanel>
+
+                            <Grid Margin="0,0,0,2">
+                                <TextBlock Text="Fuerza de Resistencia:" Foreground="#8898AA"/>
+                                <TextBlock Text="{Binding TriggerForce}" HorizontalAlignment="Right" FontWeight="Bold" Foreground="White"/>
+                            </Grid>
+                            <Slider Value="{Binding TriggerForce}" Minimum="0" Maximum="255" Margin="0,0,0,10"/>
+
+                            <Grid Margin="0,0,0,2">
+                                <TextBlock Text="Posición de Inicio:" Foreground="#8898AA"/>
+                                <TextBlock Text="{Binding TriggerStartPos}" HorizontalAlignment="Right" FontWeight="Bold" Foreground="White"/>
+                            </Grid>
+                            <Slider Value="{Binding TriggerStartPos}" Minimum="0" Maximum="255" Margin="0,0,0,10"/>
+
+                            <Grid Margin="0,0,0,2">
+                                <TextBlock Text="Frecuencia de Pulsación:" Foreground="#8898AA"/>
+                                <TextBlock Text="{Binding TriggerFrequency}" HorizontalAlignment="Right" FontWeight="Bold" Foreground="White"/>
+                            </Grid>
+                            <Slider Value="{Binding TriggerFrequency}" Minimum="0" Maximum="40" Margin="0,0,0,16"/>
+
+                            <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
+                                <Button Content="⚡ Enviar Efecto" Style="{StaticResource ActionBtn}" Command="{Binding ApplyTriggerEffectCommand}" Margin="0,0,8,0"/>
+                                <Button Content="🛑 Desactivar" Style="{StaticResource DangerBtn}" Command="{Binding StopTriggerEffectCommand}"/>
+                            </StackPanel>
+                        </StackPanel>
+                    </Border>
+                </Grid>
+
+                <!-- ========================================== -->
+                <!-- PÁGINA 3: SENSORES E IMU                   -->
+                <!-- ========================================== -->
+                <Grid Visibility="{Binding SelectedNavigationIndex, Converter={StaticResource IntToVis}, ConverterParameter=3}">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="360"/>
+                        <ColumnDefinition Width="*"/>
+                    </Grid.ColumnDefinitions>
+
+                    <!-- Horizonte 3D -->
+                    <Border Grid.Column="0" Style="{StaticResource CardBorder}" Margin="0,0,14,0">
+                        <Grid>
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="Auto"/>
+                                <RowDefinition Height="260"/>
+                                <RowDefinition Height="*"/>
+                                <RowDefinition Height="Auto"/>
+                            </Grid.RowDefinitions>
+
+                            <TextBlock Grid.Row="0" Text="HORIZONTE ARTIFICIAL 3D" FontWeight="Bold" FontSize="13" Foreground="#00C3FF" Margin="0,0,0,12"/>
+
+                            <controls:HorizonControl Grid.Row="1"
+                                                    Pitch="{Binding State.EstimatedPitchDeg}"
+                                                    Roll="{Binding State.EstimatedRollDeg}"
+                                                    HorizontalAlignment="Center" VerticalAlignment="Center"
+                                                    Width="240" Height="240"/>
+
+                            <StackPanel Grid.Row="2" VerticalAlignment="Center" Margin="0,10,0,0">
+                                <Border Background="#161B26" CornerRadius="6" Padding="12,8" Margin="0,0,0,6">
+                                    <Grid>
+                                        <TextBlock Text="Inclinación (Pitch):" Foreground="#8898AA"/>
+                                        <TextBlock Text="{Binding State.EstimatedPitchDeg, StringFormat='{}{0:F1}°'}" HorizontalAlignment="Right" FontWeight="Bold" Foreground="#00C3FF"/>
+                                    </Grid>
+                                </Border>
+                                <Border Background="#161B26" CornerRadius="6" Padding="12,8">
+                                    <Grid>
+                                        <TextBlock Text="Rotación (Roll):" Foreground="#8898AA"/>
+                                        <TextBlock Text="{Binding State.EstimatedRollDeg, StringFormat='{}{0:F1}°'}" HorizontalAlignment="Right" FontWeight="Bold" Foreground="#00E599"/>
+                                    </Grid>
+                                </Border>
+                            </StackPanel>
+
+                            <Button Grid.Row="3" Content="⚖️ Calibrar Nivel Cero" Style="{StaticResource ActionBtn}"
+                                    Command="{Binding CalibrateSensorsCommand}" HorizontalAlignment="Stretch" Margin="0,10,0,0"/>
+                        </Grid>
+                    </Border>
+
+                    <!-- Telemetría IMU y Osciloscopio -->
+                    <Border Grid.Column="1" Style="{StaticResource CardBorder}">
+                        <Grid>
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="Auto"/>
+                                <RowDefinition Height="Auto"/>
+                                <RowDefinition Height="*"/>
+                            </Grid.RowDefinitions>
+
+                            <TextBlock Grid.Row="0" Text="TELEMETRÍA DE SENSORES Y OSCILOSCOPIO" FontWeight="Bold" FontSize="13" Foreground="#00C3FF" Margin="0,0,0,12"/>
+
+                            <!-- Lecturas de Acelerómetro y Giroscopio -->
+                            <Grid Grid.Row="1" Margin="0,0,0,14">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*"/>
+                                    <ColumnDefinition Width="*"/>
+                                </Grid.ColumnDefinitions>
+
+                                <Border Grid.Column="0" Background="#161B26" CornerRadius="6" Padding="12" Margin="0,0,6,0">
+                                    <StackPanel>
+                                        <TextBlock Text="ACELERÓMETRO (G)" FontWeight="Bold" Foreground="#00C3FF" Margin="0,0,0,6"/>
+                                        <TextBlock Text="{Binding State.AccelX_G, StringFormat='{}Eje X: {0:F2} G'}" Foreground="White" FontSize="11"/>
+                                        <TextBlock Text="{Binding State.AccelY_G, StringFormat='{}Eje Y: {0:F2} G'}" Foreground="White" FontSize="11"/>
+                                        <TextBlock Text="{Binding State.AccelZ_G, StringFormat='{}Eje Z: {0:F2} G'}" Foreground="White" FontSize="11"/>
+                                    </StackPanel>
+                                </Border>
+
+                                <Border Grid.Column="1" Background="#161B26" CornerRadius="6" Padding="12" Margin="6,0,0,0">
+                                    <StackPanel>
+                                        <TextBlock Text="GIROSCOPIO (°/s)" FontWeight="Bold" Foreground="#00E599" Margin="0,0,0,6"/>
+                                        <TextBlock Text="{Binding State.GyroPitch_DegS, StringFormat='{}Pitch: {0:F1}°/s'}" Foreground="White" FontSize="11"/>
+                                        <TextBlock Text="{Binding State.GyroYaw_DegS, StringFormat='{}Yaw: {0:F1}°/s'}" Foreground="White" FontSize="11"/>
+                                        <TextBlock Text="{Binding State.GyroRoll_DegS, StringFormat='{}Roll: {0:F1}°/s'}" Foreground="White" FontSize="11"/>
+                                    </StackPanel>
+                                </Border>
+                            </Grid>
+
+                            <!-- Gráfico de Osciloscopio -->
+                            <Border Grid.Row="2" Background="#121622" CornerRadius="8" Padding="10">
+                                <controls:WaveformControl HistoryX="{Binding AccelHistoryX}"
+                                                          HistoryY="{Binding AccelHistoryY}"
+                                                          HistoryZ="{Binding AccelHistoryZ}"
+                                                          HorizontalAlignment="Stretch" VerticalAlignment="Stretch"/>
+                            </Border>
+                        </Grid>
+                    </Border>
+                </Grid>
+
+                <!-- ========================================== -->
+                <!-- PÁGINA 4: PANTALLA TÁCTIL (TOUCHPAD)       -->
+                <!-- ========================================== -->
+                <Grid Visibility="{Binding SelectedNavigationIndex, Converter={StaticResource IntToVis}, ConverterParameter=4}">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="340"/>
+                    </Grid.ColumnDefinitions>
+
+                    <Border Grid.Column="0" Style="{StaticResource CardBorder}" Margin="0,0,14,0">
+                        <Grid>
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="Auto"/>
+                                <RowDefinition Height="*"/>
+                            </Grid.RowDefinitions>
+
+                            <Grid Grid.Row="0" Margin="0,0,0,12">
+                                <TextBlock Text="SUPERFICIE MULTI-TOUCH DEL TRACKPAD" FontWeight="Bold" FontSize="13" Foreground="#00C3FF"/>
+                                <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
+                                    <CheckBox Content="Modo Trazo" IsChecked="{Binding EnableTouchTrail}" Foreground="#8898AA" Margin="0,0,12,0"/>
+                                    <Button Content="🧹 Limpiar" Style="{StaticResource SecondaryBtn}" Command="{Binding ClearTouchpadCanvasCommand}" Padding="8,4"/>
+                                </StackPanel>
+                            </Grid>
+
+                            <controls:TouchpadControl Grid.Row="1"
+                                                      Touch1="{Binding State.Touch1}"
+                                                      Touch2="{Binding State.Touch2}"
+                                                      IsClicked="{Binding State.TouchpadButton}"
+                                                      TrailPoints="{Binding TouchTrailPoints}"
+                                                      MinHeight="360"/>
+                        </Grid>
+                    </Border>
+
+                    <StackPanel Grid.Column="1">
+                        <Border Style="{StaticResource CardBorder}" Margin="0,0,0,14">
+                            <StackPanel>
+                                <TextBlock Text="DEDO 1 (PRIMARIO)" FontWeight="Bold" Foreground="#00C3FF" Margin="0,0,0,8"/>
+                                <Grid Margin="0,0,0,4">
+                                    <TextBlock Text="Activo:" Foreground="#8898AA"/>
+                                    <TextBlock Text="{Binding State.Touch1.IsActive}" HorizontalAlignment="Right" FontWeight="Bold" Foreground="White"/>
+                                </Grid>
+                                <Grid Margin="0,0,0,4">
+                                    <TextBlock Text="X (0-1920):" Foreground="#8898AA"/>
+                                    <TextBlock Text="{Binding State.Touch1.RawX}" HorizontalAlignment="Right" FontWeight="Bold" Foreground="White"/>
+                                </Grid>
+                                <Grid>
+                                    <TextBlock Text="Y (0-942):" Foreground="#8898AA"/>
+                                    <TextBlock Text="{Binding State.Touch1.RawY}" HorizontalAlignment="Right" FontWeight="Bold" Foreground="White"/>
+                                </Grid>
+                            </StackPanel>
+                        </Border>
+
+                        <Border Style="{StaticResource CardBorder}" Margin="0,0,0,14">
+                            <StackPanel>
+                                <TextBlock Text="DEDO 2 (SECUNDARIO)" FontWeight="Bold" Foreground="#FF7700" Margin="0,0,0,8"/>
+                                <Grid Margin="0,0,0,4">
+                                    <TextBlock Text="Activo:" Foreground="#8898AA"/>
+                                    <TextBlock Text="{Binding State.Touch2.IsActive}" HorizontalAlignment="Right" FontWeight="Bold" Foreground="White"/>
+                                </Grid>
+                                <Grid Margin="0,0,0,4">
+                                    <TextBlock Text="X (0-1920):" Foreground="#8898AA"/>
+                                    <TextBlock Text="{Binding State.Touch2.RawX}" HorizontalAlignment="Right" FontWeight="Bold" Foreground="White"/>
+                                </Grid>
+                                <Grid>
+                                    <TextBlock Text="Y (0-942):" Foreground="#8898AA"/>
+                                    <TextBlock Text="{Binding State.Touch2.RawY}" HorizontalAlignment="Right" FontWeight="Bold" Foreground="White"/>
+                                </Grid>
+                            </StackPanel>
+                        </Border>
+
+                        <Border Style="{StaticResource CardBorder}">
+                            <Grid>
+                                <TextBlock Text="Clic Físico:" Foreground="#8898AA" VerticalAlignment="Center"/>
+                                <Border HorizontalAlignment="Right" CornerRadius="6" Padding="12,6"
+                                        Background="{Binding State.TouchpadButton, Converter={StaticResource BoolToBrush}}">
+                                    <TextBlock Text="{Binding State.TouchpadButton, StringFormat='PRESIONADO: {0}'}" FontWeight="Bold" Foreground="#0B0E14" FontSize="11"/>
+                                </Border>
+                            </Grid>
+                        </Border>
+                    </StackPanel>
+                </Grid>
+
+                <!-- ========================================== -->
+                <!-- PÁGINA 5: VIBRACIÓN & ILUMINACIÓN LED      -->
+                <!-- ========================================== -->
+                <Grid Visibility="{Binding SelectedNavigationIndex, Converter={StaticResource IntToVis}, ConverterParameter=5}">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="*"/>
+                    </Grid.ColumnDefinitions>
+
+                    <!-- Motores de Vibración -->
+                    <Border Grid.Column="0" Style="{StaticResource CardBorder}" Margin="0,0,14,0">
+                        <StackPanel>
+                            <TextBlock Text="MOTORES DE VIBRACIÓN (RUMBLE)" FontWeight="Bold" FontSize="13" Foreground="#00C3FF" Margin="0,0,0,14"/>
+
+                            <Grid Margin="0,0,0,2">
+                                <TextBlock Text="Motor Izquierdo (Pesado / Bajos):" Foreground="#8898AA"/>
+                                <TextBlock Text="{Binding LeftHeavyRumble}" HorizontalAlignment="Right" FontWeight="Bold" Foreground="White"/>
+                            </Grid>
+                            <Slider Value="{Binding LeftHeavyRumble}" Minimum="0" Maximum="255" Margin="0,0,0,12"/>
+
+                            <Grid Margin="0,0,0,2">
+                                <TextBlock Text="Motor Derecho (Ligero / Agudos):" Foreground="#8898AA"/>
+                                <TextBlock Text="{Binding RightLightRumble}" HorizontalAlignment="Right" FontWeight="Bold" Foreground="White"/>
+                            </Grid>
+                            <Slider Value="{Binding RightLightRumble}" Minimum="0" Maximum="255" Margin="0,0,0,16"/>
+
+                            <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
+                                <Button Content="📳 Probar 1.5s" Style="{StaticResource ActionBtn}" Command="{Binding TestRumblePulseCommand}" Margin="0,0,8,0"/>
+                                <Button Content="⚡ Continuo" Style="{StaticResource ActionBtn}" Background="#8A2BE2" Command="{Binding TestRumbleContinuousCommand}" Margin="0,0,8,0"/>
+                                <Button Content="🛑 Apagar" Style="{StaticResource SecondaryBtn}" Command="{Binding StopRumbleCommand}"/>
+                            </StackPanel>
+
+                            <Border Background="#161B26" CornerRadius="6" Padding="12" Margin="0,16,0,0">
+                                <TextBlock Text="💡 Utiliza salida simultánea HID (Reporte 0x02 y 0x05) y XInput para asegurar compatibilidad con todos los chips clon."
+                                           FontSize="10" Foreground="#A0B0C4" TextWrapping="Wrap"/>
+                            </Border>
+                        </StackPanel>
+                    </Border>
+
+                    <!-- Barra de Luz LED -->
+                    <Border Grid.Column="1" Style="{StaticResource CardBorder}">
+                        <StackPanel>
+                            <TextBlock Text="BARRA DE LUZ LED (LIGHTBAR RGB)" FontWeight="Bold" FontSize="13" Foreground="#00C3FF" Margin="0,0,0,14"/>
+
+                            <Border Height="36" CornerRadius="6" Background="{Binding CurrentLedBrush}" BorderBrush="#35405A" BorderThickness="1" Margin="0,0,0,14">
+                                <TextBlock Text="COLOR TRANSMITIDO" HorizontalAlignment="Center" VerticalAlignment="Center" FontWeight="Bold" FontSize="11" Foreground="White"/>
+                            </Border>
+
+                            <Grid Margin="0,0,0,2">
+                                <TextBlock Text="Rojo (R):" Foreground="#FF5555"/>
+                                <TextBlock Text="{Binding LedR}" HorizontalAlignment="Right" FontWeight="Bold" Foreground="#FF5555"/>
+                            </Grid>
+                            <Slider Value="{Binding LedR}" Minimum="0" Maximum="255" Margin="0,0,0,8"/>
+
+                            <Grid Margin="0,0,0,2">
+                                <TextBlock Text="Verde (G):" Foreground="#00E599"/>
+                                <TextBlock Text="{Binding LedG}" HorizontalAlignment="Right" FontWeight="Bold" Foreground="#00E599"/>
+                            </Grid>
+                            <Slider Value="{Binding LedG}" Minimum="0" Maximum="255" Margin="0,0,0,8"/>
+
+                            <Grid Margin="0,0,0,2">
+                                <TextBlock Text="Azul (B):" Foreground="#00C3FF"/>
+                                <TextBlock Text="{Binding LedB}" HorizontalAlignment="Right" FontWeight="Bold" Foreground="#00C3FF"/>
+                            </Grid>
+                            <Slider Value="{Binding LedB}" Minimum="0" Maximum="255" Margin="0,0,0,14"/>
+
+                            <WrapPanel HorizontalAlignment="Center">
+                                <Button Content="Azul" Style="{StaticResource SecondaryBtn}" Command="{Binding SetLedPresetCommand}" CommandParameter="blue" Margin="3" Padding="10,5"/>
+                                <Button Content="Rojo" Style="{StaticResource SecondaryBtn}" Command="{Binding SetLedPresetCommand}" CommandParameter="red" Margin="3" Padding="10,5"/>
+                                <Button Content="Verde" Style="{StaticResource SecondaryBtn}" Command="{Binding SetLedPresetCommand}" CommandParameter="green" Margin="3" Padding="10,5"/>
+                                <Button Content="Cian" Style="{StaticResource SecondaryBtn}" Command="{Binding SetLedPresetCommand}" CommandParameter="cyan" Margin="3" Padding="10,5"/>
+                                <Button Content="Morado" Style="{StaticResource SecondaryBtn}" Command="{Binding SetLedPresetCommand}" CommandParameter="purple" Margin="3" Padding="10,5"/>
+                                <Button Content="Amarillo" Style="{StaticResource SecondaryBtn}" Command="{Binding SetLedPresetCommand}" CommandParameter="yellow" Margin="3" Padding="10,5"/>
+                                <Button Content="Blanco" Style="{StaticResource SecondaryBtn}" Command="{Binding SetLedPresetCommand}" CommandParameter="white" Margin="3" Padding="10,5"/>
+                                <Button Content="Apagar" Style="{StaticResource DangerBtn}" Command="{Binding SetLedPresetCommand}" CommandParameter="off" Margin="3" Padding="10,5"/>
+                            </WrapPanel>
+                        </StackPanel>
+                    </Border>
+                </Grid>
+
+                <!-- ========================================== -->
+                <!-- PÁGINA 6: DISPOSITIVOS & REGISTROS HEX     -->
+                <!-- ========================================== -->
+                <Grid Visibility="{Binding SelectedNavigationIndex, Converter={StaticResource IntToVis}, ConverterParameter=6}">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="*"/>
+                    </Grid.ColumnDefinitions>
+
+                    <Border Grid.Column="0" Style="{StaticResource CardBorder}" Margin="0,0,14,0">
+                        <Grid>
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="Auto"/>
+                                <RowDefinition Height="Auto"/>
+                                <RowDefinition Height="*"/>
+                            </Grid.RowDefinitions>
+
+                            <TextBlock Grid.Row="0" Text="CONFIGURACIÓN Y VOLCADO HEXADECIMAL" FontWeight="Bold" FontSize="13" Foreground="#00C3FF" Margin="0,0,0,12"/>
+
+                            <!-- Modo de Protocolo -->
+                            <StackPanel Grid.Row="1" Orientation="Horizontal" Margin="0,0,0,12">
+                                <TextBlock Text="Protocolo:" VerticalAlignment="Center" Margin="0,0,8,0" Foreground="#8898AA"/>
+                                <ComboBox Width="160" MinHeight="36" Height="36" Padding="10,6" FontSize="12" ItemsSource="{Binding ProtocolOptions}" SelectedItem="{Binding SelectedProtocol}"
+                                          Background="#1A2030" Foreground="White" Margin="0,0,14,0"/>
+                                <CheckBox Content="Mostrar Todos los Dispositivos HID" IsChecked="{Binding ShowAllHidDevices}" Foreground="#8898AA" VerticalAlignment="Center"/>
+                            </StackPanel>
+
+                            <TextBox Grid.Row="2" Text="{Binding RawHexView, Mode=OneWay}"
+                                     FontFamily="Consolas" FontSize="11" Background="#0A0C12" Foreground="#00E599"
+                                     IsReadOnly="True" VerticalScrollBarVisibility="Auto" BorderThickness="0" Padding="8"/>
+                        </Grid>
+                    </Border>
+
+                    <Border Grid.Column="1" Style="{StaticResource CardBorder}">
+                        <Grid>
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="Auto"/>
+                                <RowDefinition Height="*"/>
+                            </Grid.RowDefinitions>
+
+                            <TextBlock Grid.Row="0" Text="REGISTRO DE EVENTOS EN VIVO" FontWeight="Bold" FontSize="13" Foreground="#00C3FF" Margin="0,0,0,12"/>
+
+                            <ListBox Grid.Row="1" ItemsSource="{Binding Logs}"
+                                     Background="#0A0C12" Foreground="#C8D4E6" FontFamily="Consolas" FontSize="11"
+                                     BorderThickness="0" Padding="6"/>
+                        </Grid>
+                    </Border>
+                </Grid>
+
+                <!-- ========================================== -->
+                <!-- PÁGINA 7: AYUDA & DIAGNÓSTICO              -->
+                <!-- ========================================== -->
+                <Grid Visibility="{Binding SelectedNavigationIndex, Converter={StaticResource IntToVis}, ConverterParameter=7}">
+                    <Border Style="{StaticResource CardBorder}">
+                        <ScrollViewer VerticalScrollBarVisibility="Auto">
+                            <StackPanel Margin="10">
+                                <TextBlock Text="GUÍA Y DIAGNÓSTICO DE MANDOS IMITACIÓN" FontSize="16" FontWeight="Bold" Foreground="#00C3FF" Margin="0,0,0,14"/>
+
+                                <Border Background="#161B26" CornerRadius="8" Padding="14" Margin="0,0,0,12">
+                                    <StackPanel>
+                                        <TextBlock Text="1. ¿Cómo saber si mi mando tiene servomotores hápticos reales de PS5?" FontWeight="Bold" Foreground="#FFB300" Margin="0,0,0,6"/>
+                                        <TextBlock Text="Vaya a la pestaña 'Gatillos Hápticos', elija 'Resistencia Continua (Rigid)' con fuerza en 220 o superior y pulse 'Enviar Efecto'. Si al presionar L2 o R2 siente un tope o tensión mecánica contra su dedo, el mando posee motores servo reales. Si en lugar de eso el mando solo vibra, el clon emula la orden con el motor de vibración ordinario." Foreground="#C0D0E5" TextWrapping="Wrap"/>
+                                    </StackPanel>
+                                </Border>
+
+                                <Border Background="#161B26" CornerRadius="8" Padding="14" Margin="0,0,0,12">
+                                    <StackPanel>
+                                        <TextBlock Text="2. ¿Cómo interpretar el Test de Circularidad?" FontWeight="Bold" Foreground="#00C3FF" Margin="0,0,0,6"/>
+                                        <TextBlock Text="En la pestaña 'Circularidad', pulse 'Iniciar' y gire la palanca 1 sola vuelta completa (360°) pegada al borde. El benchmark detectará automáticamente los 360° y finalizará el test mostrando el error radial exacto. Un error menor a 8% indica sticks magnéticos Hall Effect o potenciómetros originales. Un error superior al 15% con forma cuadrada indica 'corner gating' común en réplicas económicas que saturan las diagonales." Foreground="#C0D0E5" TextWrapping="Wrap"/>
+                                    </StackPanel>
+                                </Border>
+
+                                <Border Background="#161B26" CornerRadius="8" Padding="14">
+                                    <StackPanel>
+                                        <TextBlock Text="3. Conexión USB vs Bluetooth" FontWeight="Bold" Foreground="#00E599" Margin="0,0,0,6"/>
+                                        <TextBlock Text="Para pruebas de telemetría completa y control de motores en Windows, se recomienda encarecidamente utilizar cable USB, ya que muchos chipsets clon no admiten reportes de salida extendidos por Bluetooth en PC." Foreground="#C0D0E5" TextWrapping="Wrap"/>
+                                    </StackPanel>
+                                </Border>
+                            </StackPanel>
+                        </ScrollViewer>
+                    </Border>
+                </Grid>
+            </Grid>
+        </Grid>
+    </Grid>
+</Window>
