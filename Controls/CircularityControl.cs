@@ -25,6 +25,10 @@ public class CircularityControl : FrameworkElement
         DependencyProperty.Register(nameof(IsCompleted), typeof(bool), typeof(CircularityControl),
             new FrameworkPropertyMetadata(false, FrameworkPropertyMetadataOptions.AffectsRender));
 
+    public static readonly DependencyProperty AverageErrorProperty =
+        DependencyProperty.Register(nameof(AverageError), typeof(double), typeof(CircularityControl),
+            new FrameworkPropertyMetadata(0.0, FrameworkPropertyMetadataOptions.AffectsRender));
+
     public double StickX
     {
         get => (double)GetValue(StickXProperty);
@@ -53,6 +57,12 @@ public class CircularityControl : FrameworkElement
     {
         get => (bool)GetValue(IsCompletedProperty);
         set => SetValue(IsCompletedProperty, value);
+    }
+
+    public double AverageError
+    {
+        get => (double)GetValue(AverageErrorProperty);
+        set => SetValue(AverageErrorProperty, value);
     }
 
     private static readonly Brush BgBrush = new SolidColorBrush(Color.FromRgb(14, 16, 24));
@@ -126,6 +136,13 @@ public class CircularityControl : FrameworkElement
             int count = SectorPoints.Length;
             double angleStep = 2.0 * Math.PI / count;
 
+            int validCount = 0;
+            for (int k = 0; k < count; k++)
+            {
+                if (SectorPoints[k] > 0.35) validCount++;
+            }
+            bool shouldFill = IsCompleted || (validCount >= count * 0.85);
+
             var geom = new StreamGeometry();
             using (var ctx = geom.Open())
             {
@@ -141,9 +158,9 @@ public class CircularityControl : FrameworkElement
                     double px = cx + (r * Math.Cos(angle) * unitRadius);
                     double py = cy + (r * Math.Sin(angle) * unitRadius);
 
-                    if (!figureStarted || (i - lastVisitedIndex > 2 && !IsCompleted))
+                    if (!figureStarted || (i - lastVisitedIndex > 2 && !shouldFill))
                     {
-                        ctx.BeginFigure(new Point(px, py), isFilled: IsCompleted, isClosed: IsCompleted);
+                        ctx.BeginFigure(new Point(px, py), isFilled: shouldFill, isClosed: shouldFill);
                         figureStarted = true;
                     }
                     else
@@ -155,7 +172,7 @@ public class CircularityControl : FrameworkElement
             }
             geom.Freeze();
 
-            if (IsCompleted)
+            if (shouldFill)
             {
                 dc.DrawGeometry(PolygonFill, PolygonPen, geom);
             }
@@ -173,7 +190,7 @@ public class CircularityControl : FrameworkElement
         dc.DrawLine(LiveCrossPen, new Point(currentX, currentY - 7), new Point(currentX, currentY + 7));
         dc.DrawEllipse(LiveCursorBrush, null, new Point(currentX, currentY), 4, 4);
 
-        // Etiquetas
+        // Etiquetas fijas
         var idealLabel = new FormattedText(
             "Círculo Ideal (r = 1.0)",
             System.Globalization.CultureInfo.InvariantCulture,
@@ -183,5 +200,25 @@ public class CircularityControl : FrameworkElement
             new SolidColorBrush(Color.FromRgb(0, 195, 255)),
             VisualTreeHelper.GetDpi(this).PixelsPerDip);
         dc.DrawText(idealLabel, new Point(cx + unitRadius - idealLabel.Width, cy - unitRadius - 16));
+
+        // Indicador central de Error Promedio en el Canvas (Estilo Gamepad-Tester)
+        if (AverageError > 0.0)
+        {
+            var errorText = new FormattedText(
+                $"Avg Error: {AverageError:F1}%",
+                System.Globalization.CultureInfo.InvariantCulture,
+                FlowDirection.LeftToRight,
+                new Typeface(new FontFamily("Segoe UI"), FontStyles.Normal, FontWeights.Bold, FontStretches.Normal),
+                13,
+                new SolidColorBrush(Color.FromRgb(0, 229, 153)),
+                VisualTreeHelper.GetDpi(this).PixelsPerDip);
+
+            // Badge semitransparente detrás del texto
+            double badgeW = errorText.Width + 14;
+            double badgeH = errorText.Height + 6;
+            var badgeRect = new Rect(14, 14, badgeW, badgeH);
+            dc.DrawRoundedRectangle(new SolidColorBrush(Color.FromArgb(180, 16, 22, 34)), new Pen(new SolidColorBrush(Color.FromRgb(0, 229, 153)), 1), badgeRect, 4, 4);
+            dc.DrawText(errorText, new Point(21, 17));
+        }
     }
 }

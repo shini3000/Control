@@ -405,7 +405,13 @@ public class MainViewModel : ViewModelBase
     public double CircularityMinRadius => CircularityTester.MinRadius;
     public double CircularityCoverage => CircularityTester.CoveragePercent;
     public double CircularityLapProgress => CircularityTester.LapProgressPercent;
-    public string CircularityVerdict => CircularityTester.RatingVerdict;
+    public string CircularityVerdict => CircularityTester.StatusDescription;
+    public string CircularityQualityTag => CircularityTester.QualityTag;
+    public string CircularityStatusDescription => CircularityTester.StatusDescription;
+    public string CircularityCornerGatingText => CircularityTester.CornerGatingText;
+    public Brush CircularityCornerGatingBrush => (Brush)new BrushConverter().ConvertFromString(CircularityTester.CornerGatingColor)!;
+    public string CircularityRestDriftText => CircularityTester.RestDriftText;
+    public string CircularityProfileType => CircularityTester.ProfileType;
     public Brush CircularityRatingBrush => (Brush)new BrushConverter().ConvertFromString(CircularityTester.RatingColor)!;
 
     public double CurrentTestStickX => SelectedCircularityStick.Contains("Izquierdo") ? State.LeftStickX : State.RightStickX;
@@ -593,6 +599,12 @@ public class MainViewModel : ViewModelBase
             OnPropertyChanged(nameof(IsCircularityRunning));
             OnPropertyChanged(nameof(CircularityVerdict));
             OnPropertyChanged(nameof(CircularityRatingBrush));
+            OnPropertyChanged(nameof(CircularityQualityTag));
+            OnPropertyChanged(nameof(CircularityStatusDescription));
+            OnPropertyChanged(nameof(CircularityCornerGatingText));
+            OnPropertyChanged(nameof(CircularityCornerGatingBrush));
+            OnPropertyChanged(nameof(CircularityRestDriftText));
+            OnPropertyChanged(nameof(CircularityProfileType));
         }
 
         // Detección de última pulsación para el panel de botones
@@ -825,6 +837,12 @@ public class MainViewModel : ViewModelBase
         OnPropertyChanged(nameof(IsCircularityCompleted));
         OnPropertyChanged(nameof(CircularityVerdict));
         OnPropertyChanged(nameof(CircularityRatingBrush));
+        OnPropertyChanged(nameof(CircularityQualityTag));
+        OnPropertyChanged(nameof(CircularityStatusDescription));
+        OnPropertyChanged(nameof(CircularityCornerGatingText));
+        OnPropertyChanged(nameof(CircularityCornerGatingBrush));
+        OnPropertyChanged(nameof(CircularityRestDriftText));
+        OnPropertyChanged(nameof(CircularityProfileType));
         OnPropertyChanged(nameof(IsCircularityRunning));
     }
 
